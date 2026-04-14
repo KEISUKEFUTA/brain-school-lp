@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>脳の学校 — 4ヶ月 伴走型プロジェクト</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Serif+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fafafa;--white:#fff;
+      --blue:#1a6fb5;--blue-soft:#4a9ad4;--blue-pale:#e8f2fb;
+      --violet:#7b5ea7;--violet-pale:#f0ecf8;
+      --coral:#d96a52;--coral-pale:#fce8e2;
+      --mint:#4da882;--mint-pale:#e3f5ed;
+      --text:#1d1d1f;--text2:#48484a;--text3:#86868b;
+      --border:rgba(0,0,0,0.06);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;}
+    body{font-family:'Zen Maru Gothic',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;overflow-x:hidden;}
+    .serif{font-family:'Noto Serif JP',serif;}
+    img{display:block;width:100%;height:100%;object-fit:cover;}
+
+    /* ===== HERO ===== */
+    .hero{position:relative;height:100vh;min-height:600px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;}
+    .hero-bg{position:absolute;inset:0;}
+    .hero-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(0.4);}
+    .hero-content{position:relative;z-index:2;padding:2rem;max-width:700px;}
+    .hero-eyebrow{font-size:0.72rem;font-weight:500;letter-spacing:0.18em;color:rgba(255,255,255,0.6);margin-bottom:1.2rem;}
+    .hero-title{font-family:'Noto Serif JP',serif;font-size:clamp(3.2rem,10vw,6.5rem);font-weight:700;color:#fff;letter-spacing:0.04em;line-height:1.15;margin-bottom:0.8rem;}
+    .hero-subtitle{font-family:'Noto Serif JP',serif;font-size:clamp(1rem,2.2vw,1.4rem);font-weight:400;color:rgba(255,255,255,0.88);line-height:1.9;margin-bottom:1.5rem;}
+    .hero-desc{font-size:0.88rem;color:rgba(255,255,255,0.55);max-width:380px;margin:0 auto 1.5rem;line-height:2;}
+    .hero-meta{font-size:0.68rem;color:rgba(255,255,255,0.4);letter-spacing:0.06em;}
+    .hero-cta{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;font-weight:600;color:#fff;text-decoration:none;margin-top:1.8rem;padding:0.75rem 1.8rem;border-radius:980px;border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(8px);transition:all 0.3s;}
+    .hero-cta:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.6);}
+    .hero-cta svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;}
+
+    /* ===== COMMON ===== */
+    .sec{padding:7rem 0;}
+    .sec-warm{background:#f7f5f2;}
+    .sec-white{background:var(--white);}
+    .container{max-width:1000px;margin:0 auto;padding:0 2rem;}
+    .container-sm{max-width:660px;margin:0 auto;padding:0 2rem;}
+    .text-center{text-align:center;}
+
+    .sec-eyebrow{font-size:0.62rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;margin-bottom:0.8rem;}
+    .ey-blue{color:var(--blue);}
+    .ey-coral{color:var(--coral);}
+    .ey-violet{color:var(--violet);}
+    .ey-mint{color:var(--mint);}
+    .sec-title{font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,3.5vw,2.4rem);font-weight:700;line-height:1.6;margin-bottom:1.2rem;}
+    .sec-lead{font-size:0.93rem;color:var(--text2);font-weight:400;line-height:2.2;margin-bottom:2rem;max-width:540px;}
+    .text-center .sec-lead{margin-left:auto;margin-right:auto;}
+
+    /* ===== PHOTO BREAK ===== */
+    .photo-break{position:relative;height:55vh;min-height:340px;max-height:520px;overflow:hidden;}
+    .photo-break img{filter:brightness(0.7);}
+    .photo-break-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;}
+    .photo-break-overlay p{font-family:'Noto Serif JP',serif;font-size:clamp(1.15rem,2.8vw,1.7rem);font-weight:500;color:#fff;line-height:2;max-width:500px;text-shadow:0 2px 30px rgba(0,0,0,0.4);}
+
+    /* ===== EMPATHY ===== */
+    .empathy-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;margin-top:2.5rem;}
+    .empathy-photo{border-radius:20px;overflow:hidden;aspect-ratio:4/5;max-height:500px;}
+    .empathy-poem{font-family:'Noto Serif JP',serif;font-size:0.93rem;line-height:2.5;color:var(--text2);font-weight:300;margin-bottom:2rem;padding-left:1.2rem;border-left:2px solid var(--blue-pale);}
+
+    .voice-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
+    .voice-item{display:flex;align-items:center;gap:0.8rem;padding:0.9rem 1.2rem;border-radius:12px;background:var(--white);border:1px solid var(--border);font-size:0.85rem;color:var(--text2);transition:box-shadow 0.3s;}
+    .voice-item:hover{box-shadow:0 4px 16px rgba(0,0,0,0.04);}
+    .v-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+    .answer-banner{margin-top:2rem;padding:1.8rem;border-radius:16px;text-align:center;background:linear-gradient(135deg,var(--blue-pale),var(--violet-pale));}
+    .answer-banner p{font-size:1rem;color:var(--text);line-height:2;}
+    .answer-banner strong{font-weight:900;color:var(--blue);}
+
+    /* ===== CONCEPT VISUAL ===== */
+    .concept-visual{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin:3rem 0;flex-wrap:wrap;}
+    .cv-bubble{text-align:center;padding:1.4rem 2.4rem;border-radius:60px;min-width:140px;}
+    .cv-from{background:var(--coral-pale);}
+    .cv-to{background:var(--blue-pale);}
+    .cv-label{font-size:0.55rem;color:var(--text3);letter-spacing:0.18em;font-weight:700;}
+    .cv-val{font-size:1.6rem;font-weight:900;}
+    .cv-from .cv-val{color:var(--coral);}
+    .cv-to .cv-val{color:var(--blue);}
+    .cv-arrow{width:32px;height:32px;color:var(--text3);}
+
+    /* ===== PILLARS ===== */
+    .pillars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin:3rem 0;}
+    .p-card{background:var(--white);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:transform 0.3s,box-shadow 0.3s;}
+    .p-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.08);}
+    .p-card-img{height:200px;overflow:hidden;}
+    .p-card-img img{transition:transform 0.6s;}
+    .p-card:hover .p-card-img img{transform:scale(1.05);}
+    .p-card-body{padding:1.5rem;}
+    .p-num{font-size:0.58rem;font-weight:900;letter-spacing:0.15em;color:var(--text3);margin-bottom:0.3rem;}
+    .p-card h3{font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:700;margin-bottom:0.3rem;line-height:1.5;}
+    .p-card p.desc{font-size:0.8rem;color:var(--text3);line-height:1.8;}
+
+    .p-details{display:flex;flex-direction:column;gap:1.2rem;}
+    .p-detail{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.8rem 2rem;transition:box-shadow 0.3s;}
+    .p-detail:hover{box-shadow:0 4px 20px rgba(0,0,0,0.04);}
+    .p-detail-head{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.5rem;}
+    .p-detail-num{width:28px;height:28px;border-radius:8px;font-size:0.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .p-detail:nth-child(1) .p-detail-num{background:var(--mint-pale);color:var(--mint);}
+    .p-detail:nth-child(2) .p-detail-num{background:var(--blue-pale);color:var(--blue);}
+    .p-detail:nth-child(3) .p-detail-num{background:var(--violet-pale);color:var(--violet);}
+    .p-detail h4{font-family:'Noto Serif JP',serif;font-size:1.05rem;font-weight:700;}
+    .p-detail-sub{font-size:0.78rem;color:var(--coral);margin-bottom:0.4rem;}
+    .p-detail-body{font-size:0.88rem;color:var(--text2);line-height:2.1;}
+    .p-detail-body strong{color:var(--text);font-weight:700;}
+    .p-detail-info{margin-top:0.8rem;padding:0.8rem 1rem;background:var(--bg);border-radius:10px;font-size:0.76rem;color:var(--text3);}
+    .p-detail-info .time{color:var(--blue);font-weight:700;}
+    .p-detail-info ul{list-style:none;margin-top:0.3rem;}
+    .p-detail-info li{padding:0.15rem 0 0.15rem 1rem;position:relative;}
+    .p-detail-info li::before{content:'—';position:absolute;left:0;color:var(--blue-soft);}
+
+    /* ===== STEPS ===== */
+    .steps-row{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:0;margin:3rem 0;}
+    .step-card{background:var(--white);border:1px solid var(--border);border-radius:18px;overflow:hidden;text-align:center;transition:transform 0.3s,box-shadow 0.3s;}
+    .step-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.06);}
+    .step-img{height:150px;overflow:hidden;}
+    .step-img img{transition:transform 0.6s;}
+    .step-card:hover .step-img img{transform:scale(1.05);}
+    .step-body{padding:1.2rem 1rem;}
+    .step-label{font-size:0.58rem;font-weight:900;letter-spacing:0.15em;color:var(--text3);margin-bottom:0.3rem;}
+    .step-card h3{font-family:'Noto Serif JP',serif;font-size:0.92rem;font-weight:700;margin-bottom:0.2rem;line-height:1.5;}
+    .step-card p{font-size:0.78rem;color:var(--text3);line-height:1.7;}
+    .step-arrow{display:flex;align-items:center;justify-content:center;padding:0 0.4rem;}
+    .step-arrow svg{width:22px;height:22px;stroke:var(--text3);fill:none;stroke-width:1.5;opacity:0.35;}
+
+    /* ===== INVITATION ===== */
+    .invite-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem;}
+    .invite-card{background:var(--white);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:box-shadow 0.3s;}
+    .invite-card:hover{box-shadow:0 8px 30px rgba(0,0,0,0.06);}
+    .invite-photo{height:220px;overflow:hidden;}
+    .invite-photo img{transition:transform 0.6s;}
+    .invite-card:hover .invite-photo img{transform:scale(1.03);}
+    .invite-body-wrap{padding:2rem 1.8rem;}
+    .invite-for{font-size:0.58rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.6rem;}
+    .invite-card.front .invite-for{color:var(--blue);}
+    .invite-card.bansou .invite-for{color:var(--coral);}
+    .invite-card h3{font-family:'Noto Serif JP',serif;font-size:1.1rem;font-weight:700;margin-bottom:1rem;line-height:1.7;}
+    .invite-body{font-size:0.86rem;color:var(--text2);line-height:2.2;}
+    .invite-body strong{color:var(--text);font-weight:700;}
+    .invite-body .accent{display:block;font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:700;color:var(--blue);margin:0.6rem 0;}
+
+    /* ===== CTA ===== */
+    .cta-sec{text-align:center;padding:6rem 2rem 7rem;}
+    .cta-title{font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,4vw,2.4rem);font-weight:700;margin-bottom:0.8rem;}
+    .cta-title .blue{color:var(--blue);}
+    .cta-sub{font-size:0.9rem;color:var(--text2);margin-bottom:2.5rem;line-height:2;}
+    .cta-btn{display:inline-flex;align-items:center;gap:0.7rem;background:#06c755;color:#fff;font-size:1rem;font-weight:700;padding:1.1rem 2.4rem;border-radius:980px;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 4px 20px rgba(6,199,85,0.25);}
+    .cta-btn:hover{transform:scale(1.03);box-shadow:0 8px 32px rgba(6,199,85,0.35);}
+    .cta-btn svg{width:20px;height:20px;fill:#fff;}
+    .cta-note{margin-top:1rem;font-size:0.7rem;color:var(--text3);}
+
+    /* ===== FOOTER ===== */
+    footer{border-top:1px solid var(--border);padding:2.5rem 2rem;text-align:center;}
+    .f-orgs{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;margin-bottom:0.8rem;}
+    .f-org{font-size:0.72rem;color:var(--text3);}
+    .f-org .name{color:var(--text2);font-weight:700;}
+    .f-info{font-size:0.66rem;color:var(--text3);}
+    .f-copy{margin-top:1rem;font-size:0.6rem;color:var(--text3);}
+
+    /* ===== ANIMATION (CSS-only with scroll-driven) ===== */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(36px);}to{opacity:1;transform:translateY(0);}}
+    .reveal{animation:fadeUp 0.8s cubic-bezier(.25,.46,.45,.94) both;animation-timeline:view();animation-range:entry 0% entry 30%;}
+    .reveal-d1{animation-delay:.12s;}.reveal-d2{animation-delay:.24s;}.reveal-d3{animation-delay:.36s;}
+    /* Fallback for browsers without scroll-timeline */
+    @supports not (animation-timeline:view()){
+      .reveal{opacity:1;transform:none;animation:none;}
+    }
+
+    @media(max-width:768px){
+      .empathy-grid,.invite-grid{grid-template-columns:1fr;}
+      .pillars-grid{grid-template-columns:1fr;}
+      .steps-row{grid-template-columns:1fr;gap:1rem;}
+      .step-arrow{transform:rotate(90deg);padding:0;}
+      .sec{padding:5rem 0;}
+      .container,.container-sm{padding:0 1.5rem;}
+      .photo-break{height:35vh;min-height:240px;}
+    }
+    @media(max-width:480px){
+      .concept-visual{flex-direction:column;}
+      .cv-arrow{transform:rotate(90deg);}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-bg"><img src="images/hero.jpg" alt=""></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">4ヶ月 伴走型プロジェクト &ensp;|&ensp; 2026.08 — 12</p>
+    <h1 class="hero-title">脳の学校</h1>
+    <p class="hero-subtitle serif">あの日の「変わりたい」を、<br>本当に変わる4ヶ月へ。</p>
+    <p class="hero-desc">脳科学 &times; 伴走。<br>きみの中に生まれた火を、消させない。</p>
+    <p class="hero-meta">DAncing Einstein &times; E3 Habit</p>
+    <a href="#join" class="hero-cta">参加方法を見る <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  </div>
+</section>
+
+<!-- ===== EMPATHY ===== -->
+<div class="sec sec-white">
+<div class="container">
+  <div class="reveal">
+    <p class="sec-eyebrow ey-coral">Question</p>
+    <h2 class="sec-title serif">「すごい体験だった」──<br>で、終わっていないか。</h2>
+  </div>
+  <div class="empathy-grid">
+    <div class="empathy-photo reveal"><img src="images/empathy.jpg" alt="" loading="lazy"></div>
+    <div class="reveal reveal-d1">
+      <div class="empathy-poem">ツアーで聴いた話に、心が震えた。<br>「自分も変われるかもしれない」と、確かに思った。<br><br>でも、月曜日が来て、火曜日が来て、<br>いつもの教室、いつもの日常に戻ったとき──<br>あの熱量は、いつの間にか冷めていた。</div>
+      <div class="voice-list">
+        <div class="voice-item"><div class="v-dot" style="background:var(--blue)"></div>やりたいことがある。でも、何から始めればいいか分からない</div>
+        <div class="voice-item"><div class="v-dot" style="background:var(--violet)"></div>一人で続けるのが、しんどい</div>
+        <div class="voice-item"><div class="v-dot" style="background:var(--coral)"></div>周りに話しても、なんか伝わらない</div>
+      </div>
+      <div class="answer-banner">
+        <p>それは、きみが弱いからじゃない。<br>脳が変わるには、<strong>"仕組み"</strong>がいるだけだ。</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Photo Break 1 -->
+<div class="photo-break">
+  <img src="images/break1.jpg" alt="" loading="lazy">
+  <div class="photo-break-overlay">
+    <p>ひとりで走らなくていい。<br>きみの隣には、<strong>伴走者</strong>がいる。</p>
+  </div>
+</div>
+
+<!-- ===== CONCEPT ===== -->
+<div class="sec sec-warm">
+<div class="container-sm text-center">
+  <div class="reveal">
+    <p class="sec-eyebrow ey-blue">Concept</p>
+    <h2 class="sec-title serif">熱狂を、習慣に書き換える。</h2>
+    <p class="sec-lead">脳科学者・青砥瑞人が提唱する「神経可塑性」──脳は繰り返しの刺激で物理的に回路を書き換える。一度のインスピレーションでは変わらない。でも、正しいプロセスを踏めば、確実に変わる。</p>
+  </div>
+  <div class="concept-visual reveal">
+    <div class="cv-bubble cv-from"><div class="cv-label">FROM</div><div class="cv-val">熱狂</div></div>
+    <svg class="cv-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    <div class="cv-bubble cv-to"><div class="cv-label">TO</div><div class="cv-val">習慣</div></div>
+  </div>
+  <p class="sec-lead reveal" style="margin-top:0">心理的安全性と承認。定点観測と小さな言語化。<br><strong style="color:var(--text)">孤独な挑戦を、確かな自己変容へ。</strong></p>
+</div>
+</div>
+
+<!-- ===== PILLARS ===== -->
+<div class="sec sec-white">
+<div class="container text-center">
+  <div class="reveal">
+    <p class="sec-eyebrow ey-violet">Program</p>
+    <h2 class="sec-title serif">きみの4ヶ月を支える、3つの仕組み。</h2>
+  </div>
+
+  <div class="pillars-grid">
+    <div class="p-card reveal reveal-d1">
+      <div class="p-card-img"><img src="images/pillar1.jpg" alt="" loading="lazy"></div>
+      <div class="p-card-body">
+        <div class="p-num">01</div>
+        <h3>いつでも繋がれる居場所</h3>
+        <p class="desc">LINEオープンチャットで<br>心理的安全な場を提供</p>
+      </div>
+    </div>
+    <div class="p-card reveal reveal-d2">
+      <div class="p-card-img"><img src="images/pillar2.jpg" alt="" loading="lazy"></div>
+      <div class="p-card-body">
+        <div class="p-num">02</div>
+        <h3>毎週土曜の定点観測</h3>
+        <p class="desc">45分のオンラインMTGで<br>振り返りと展望を言語化</p>
+      </div>
+    </div>
+    <div class="p-card reveal reveal-d3">
+      <div class="p-card-img"><img src="images/pillar3.jpg" alt="" loading="lazy"></div>
+      <div class="p-card-body">
+        <div class="p-num">03</div>
+        <h3>突破のためのインプット</h3>
+        <p class="desc">オンライン勉強会で<br>停滞を突破するきっかけ</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-details" style="text-align:left;margin-top:2rem;">
+    <div class="p-detail reveal">
+      <div class="p-detail-head"><div class="p-detail-num">01</div><h4>会いたい時に会える居場所</h4></div>
+      <p class="p-detail-sub">ハードルは、限りなくゼロに。</p>
+      <p class="p-detail-body">LINEオープンチャットとグループで、いつでも仲間と繋がれる。「相談したい」と思った瞬間に開ける場所がある。わざわざ予約する必要も、改まる必要もない。<br><strong>ここは、きみの"安全基地"だ。</strong></p>
+    </div>
+    <div class="p-detail reveal">
+      <div class="p-detail-head"><div class="p-detail-num">02</div><h4>毎週土曜の定点観測</h4></div>
+      <p class="p-detail-sub">完璧じゃなくていい。言葉にし続けるだけでいい。</p>
+      <p class="p-detail-body">45分間のオンラインMTGで、先週を振り返り、今週を見据える。いきなり完璧を求めない。大人たちが「ちゃんと見ているよ」と伝え続ける。<br><strong>その繰り返しが、脳の回路を書き換えていく。</strong></p>
+      <div class="p-detail-info"><span class="time">毎週土曜 20:00 - 20:45</span>（2026年8月〜12月）<ul><li>先週の振り返り：やったこと、感じたこと、つまずいたこと</li><li>今週の展望：次の7日間で、ひとつだけ試すこと</li></ul></div>
+    </div>
+    <div class="p-detail reveal">
+      <div class="p-detail-head"><div class="p-detail-num">03</div><h4>突破のためのインプット</h4></div>
+      <p class="p-detail-sub">停滞は、新しい刺激で壊せる。</p>
+      <p class="p-detail-body">土曜の夜に数回のオンライン勉強会を開催。脳科学の知見や、先輩たちのリアルな体験談を共有する。<br>「もうダメかも」と思った時こそ、<strong>新しい視点が、きみの天井をぶち抜く。</strong></p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Photo Break 2 -->
+<div class="photo-break">
+  <img src="images/break2.jpg" alt="" loading="lazy">
+  <div class="photo-break-overlay">
+    <p>完璧な計画はいらない。<br>「なんか気になる」──その直感で十分だ。</p>
+  </div>
+</div>
+
+<!-- ===== STEPS ===== -->
+<div class="sec sec-white" id="join">
+<div class="container text-center">
+  <div class="reveal">
+    <p class="sec-eyebrow ey-blue">How to Join</p>
+    <h2 class="sec-title serif">参加はかんたん、3ステップ。</h2>
+  </div>
+  <div class="steps-row reveal">
+    <div class="step-card">
+      <div class="step-img"><img src="images/step1.jpg" alt="" loading="lazy"></div>
+      <div class="step-body">
+        <div class="step-label">STEP 1</div>
+        <h3>このページを読む</h3>
+        <p>プロジェクトの全体像を知る</p>
+      </div>
+    </div>
+    <div class="step-arrow"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    <div class="step-card">
+      <div class="step-img"><img src="images/step2.jpg" alt="" loading="lazy"></div>
+      <div class="step-body">
+        <div class="step-label">STEP 2</div>
+        <h3>LINEに登録する</h3>
+        <p>匿名OK・無料で参加</p>
+      </div>
+    </div>
+    <div class="step-arrow"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    <div class="step-card">
+      <div class="step-img"><img src="images/step3.jpg" alt="" loading="lazy"></div>
+      <div class="step-body">
+        <div class="step-label">STEP 3</div>
+        <h3>仲間と歩き出す</h3>
+        <p>8月から伴走者と一緒に</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== INVITATION ===== -->
+<div class="sec sec-warm">
+<div class="container">
+  <div class="text-center reveal">
+    <p class="sec-eyebrow ey-mint">Invitation</p>
+    <h2 class="sec-title serif">この手紙は、きみに届くべきものだ。</h2>
+  </div>
+  <div class="invite-grid">
+    <div class="invite-card front reveal reveal-d1">
+      <div class="invite-photo"><img src="images/invite1.jpg" alt="" loading="lazy"></div>
+      <div class="invite-body-wrap">
+        <p class="invite-for">For Frontrunners ── 小・中・高校生、教員のあなたへ</p>
+        <h3 class="serif">最初の一歩は、<br>"入る"だけでいい。</h3>
+        <p class="invite-body">あのとき感じた「変わりたい」は、本物だ。嘘じゃない。幻でもない。<br><br>ただ、ひとりで走り続けるには、道が長すぎるだけ。<span class="accent">だから、一緒にやろう。</span>完璧な計画はいらない。「なんか気になる」──その直感だけで十分だ。<br><br><strong>4ヶ月後のきみは、今のきみが想像もしない場所に立っている。</strong></p>
+      </div>
+    </div>
+    <div class="invite-card bansou reveal reveal-d2">
+      <div class="invite-photo"><img src="images/invite2.jpg" alt="" loading="lazy"></div>
+      <div class="invite-body-wrap">
+        <p class="invite-for">For Bansou ── 伴走者となる大人たちへ</p>
+        <h3 class="serif">"見ているよ"──<br>その一言が、脳を変える。</h3>
+        <p class="invite-body"><strong>ただ、そこにいること。</strong><br><strong>「先週より、ここが変わったね」と気づくこと。</strong><br><strong>「大丈夫、続けていい」と伝えること。</strong><br><br>子どもたちの定点観測を支え、心理的安全性と承認を届ける。それは、あなた自身の成長でもある。<br><br><strong>双方向の成長循環──それが、脳の学校のエコシステムだ。</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== CTA ===== -->
+<div class="cta-sec">
+  <div class="reveal">
+    <h2 class="cta-title serif">扉は、もう<span class="blue">開いている。</span></h2>
+    <p class="cta-sub">「4ヶ月 脳の学校」の入口は、LINEオープンチャット。<br>登録は無料。今すぐ、きみの居場所に入れる。</p>
+    <a href="#" class="cta-btn">
+      <svg viewBox="0 0 24 24"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.271.173-.508.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+      LINEで「脳の学校」に参加する
+    </a>
+    <p class="cta-note">※ LINEオープンチャットに遷移します。匿名参加OK。いつでも退出できます。</p>
+  </div>
+</div>
+
+<footer>
+  <div class="f-orgs">
+    <div class="f-org"><span class="name">DAncing Einstein</span><br>青砥瑞人</div>
+    <div class="f-org"><span class="name">株式会社E3 Habit</span><br>代表取締役 二川佳祐</div>
+  </div>
+  <p class="f-info">期間：2026年8月〜12月（4ヶ月間）&ensp;|&ensp;LINEオープンチャットへの参加は無料</p>
+  <p class="f-copy">&copy; 2026 脳の学校</p>
+</footer>
+
+<script>
+// Robust reveal: works in all environments
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){
+    els.forEach(function(el){el.style.opacity='1';el.style.transform='none';});
+    return;
+  }
+  // Reset to hidden for JS-driven animation
+  els.forEach(function(el){el.style.opacity='0';el.style.transform='translateY(36px)';el.style.transition='opacity 0.8s cubic-bezier(.25,.46,.45,.94),transform 0.8s cubic-bezier(.25,.46,.45,.94)';});
+  var ob=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';ob.unobserve(e.target);}
+    });
+  },{threshold:0.02,rootMargin:'0px 0px 0px 0px'});
+  els.forEach(function(el){ob.observe(el);});
+  // Safety fallback
+  setTimeout(function(){els.forEach(function(el){el.style.opacity='1';el.style.transform='none';});},1500);
+})();
+</script>
+</body>
+</html>
