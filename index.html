@@ -3,424 +3,697 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>脳の学校 — 4ヶ月 伴走型プロジェクト</title>
+  <title>Synapse Cafe — 中高生のための脳と習慣のラボ</title>
+  <meta name="description" content="脳科学者・青砥瑞人と二川佳祐がつくる、中高生のための4ヶ月の思考コミュニティ。LINEオープンチャットから無料・匿名で参加できます。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Serif+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Noto+Sans+JP:wght@400;500;700;800&family=Noto+Serif+JP:wght@500;600&display=swap" rel="stylesheet">
   <style>
+
     :root{
-      --bg:#fafafa;--white:#fff;
-      --blue:#1a6fb5;--blue-soft:#4a9ad4;--blue-pale:#e8f2fb;
-      --violet:#7b5ea7;--violet-pale:#f0ecf8;
-      --coral:#d96a52;--coral-pale:#fce8e2;
-      --mint:#4da882;--mint-pale:#e3f5ed;
-      --text:#1d1d1f;--text2:#48484a;--text3:#86868b;
-      --border:rgba(0,0,0,0.06);
+      --paper:#fbfdf8;
+      --paper-deep:#eef8f4;
+      --white:#ffffff;
+      --ink:#17212b;
+      --ink-2:#41505f;
+      --ink-3:#6f7b87;
+      --line:rgba(23,33,43,0.12);
+      --line-strong:rgba(23,33,43,0.2);
+      --sky:#1b8cff;
+      --sky-soft:#dff0ff;
+      --coral:#ff6542;
+      --coral-soft:#ffe7de;
+      --lime:#c7f04a;
+      --lime-soft:#f1ffd2;
+      --violet:#7a5cff;
+      --violet-soft:#ece8ff;
+      --green:#06c755;
+      --shadow:0 18px 45px rgba(30,50,70,0.12);
     }
     *{margin:0;padding:0;box-sizing:border-box;}
-    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;}
-    body{font-family:'Zen Maru Gothic',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;overflow-x:hidden;}
+    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+    body{
+      font-family:'Noto Sans JP','M PLUS Rounded 1c',sans-serif;
+      background:
+        linear-gradient(rgba(23,33,43,0.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(23,33,43,0.035) 1px,transparent 1px),
+        var(--paper);
+      background-size:32px 32px;
+      color:var(--ink);
+      line-height:1.85;
+      overflow-x:hidden;
+      font-weight:500;
+    }
     .serif{font-family:'Noto Serif JP',serif;}
+    .latin,.ui{font-family:'Inter',sans-serif;}
     img{display:block;width:100%;height:100%;object-fit:cover;}
+    a{color:inherit;text-decoration:none;}
+
+    /* ===== NAV ===== */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:50;
+      padding:0.9rem clamp(1rem,3vw,2rem);
+      display:flex;justify-content:space-between;align-items:center;gap:1rem;
+      color:var(--ink);
+      background:rgba(251,253,248,0.82);
+      border-bottom:1px solid rgba(23,33,43,0.08);
+      backdrop-filter:blur(16px);
+    }
+    .nav-brand{font-size:1rem;font-weight:800;letter-spacing:0;}
+    .nav-brand::before{content:"";display:inline-block;width:0.72rem;height:0.72rem;margin-right:0.55rem;background:var(--lime);border:2px solid var(--ink);vertical-align:-0.02rem;}
+    .nav-meta{font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:800;color:var(--ink-2);}
+    .nav-cta{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:34px;padding:0.45rem 0.85rem;
+      border:1px solid var(--ink);background:var(--ink);color:#fff;
+      font-size:0.78rem;font-weight:800;border-radius:8px;
+      box-shadow:4px 4px 0 var(--lime);
+      transition:transform .2s,box-shadow .2s;
+    }
+    .nav-cta:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--lime);}
 
     /* ===== HERO ===== */
-    .hero{position:relative;height:100vh;min-height:600px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;}
-    .hero-bg{position:absolute;inset:0;}
-    .hero-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(0.4);}
-    .hero-content{position:relative;z-index:2;padding:2rem;max-width:700px;}
-    .hero-eyebrow{font-size:0.72rem;font-weight:500;letter-spacing:0.18em;color:rgba(255,255,255,0.6);margin-bottom:1.2rem;}
-    .hero-title{font-family:'Noto Serif JP',serif;font-size:clamp(3.2rem,10vw,6.5rem);font-weight:700;color:#fff;letter-spacing:0.04em;line-height:1.15;margin-bottom:0.8rem;}
-    .hero-subtitle{font-family:'Noto Serif JP',serif;font-size:clamp(1rem,2.2vw,1.4rem);font-weight:400;color:rgba(255,255,255,0.88);line-height:1.9;margin-bottom:1.5rem;}
-    .hero-desc{font-size:0.88rem;color:rgba(255,255,255,0.55);max-width:380px;margin:0 auto 1.5rem;line-height:2;}
-    .hero-meta{font-size:0.68rem;color:rgba(255,255,255,0.4);letter-spacing:0.06em;}
-    .hero-cta{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;font-weight:600;color:#fff;text-decoration:none;margin-top:1.8rem;padding:0.75rem 1.8rem;border-radius:980px;border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(8px);transition:all 0.3s;}
-    .hero-cta:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.6);}
-    .hero-cta svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;}
+    .hero{
+      position:relative;height:88svh;min-height:540px;max-height:820px;overflow:hidden;
+      background:var(--paper);isolation:isolate;
+    }
+    .hero-img{position:absolute;inset:0;}
+    .hero-img img{filter:brightness(1.05) contrast(1.02) saturate(1.08);object-position:center;}
+    .hero-grad{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(90deg,rgba(251,253,248,0.94) 0%,rgba(251,253,248,0.78) 42%,rgba(251,253,248,0.2) 78%),
+        linear-gradient(180deg,rgba(255,255,255,0.52) 0%,rgba(238,248,244,0.55) 100%);
+    }
+    .hero::after{
+      content:"";position:absolute;inset:0;pointer-events:none;opacity:.42;
+      background:
+        linear-gradient(rgba(23,33,43,.07) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(23,33,43,.07) 1px,transparent 1px);
+      background-size:72px 72px;
+      mask-image:linear-gradient(90deg,#000 0%,transparent 88%);
+    }
+    .hero-content{position:absolute;inset:0;z-index:2;display:flex;align-items:flex-end;padding:6.5rem 2.5rem 4rem;color:var(--ink);}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:3rem;align-items:end;max-width:1180px;width:100%;margin:0 auto;}
+    .hero-eyebrow{
+      display:inline-flex;align-items:center;gap:.65rem;
+      font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;font-weight:800;
+      color:var(--sky);margin-bottom:1rem;
+    }
+    .hero-eyebrow::before{content:"";width:34px;height:3px;background:var(--lime);box-shadow:10px 8px 0 var(--coral);}
+    .hero-title{
+      font-family:'Inter',sans-serif;font-weight:800;
+      font-size:clamp(3.3rem,8.4vw,7.2rem);
+      line-height:.93;letter-spacing:0;margin-bottom:1rem;
+    }
+    .hero-title .a,.hero-title .b{display:block;}
+    .hero-title .b{color:var(--lime);text-shadow:4px 4px 0 rgba(255,101,66,.68);padding-left:.65em;}
+    .hero-ja{font-weight:800;font-size:clamp(1.02rem,1.7vw,1.22rem);letter-spacing:.08em;color:var(--ink);}
+    .hero-right{display:flex;flex-direction:column;align-items:flex-start;gap:1.1rem;}
+    .hero-tagline{font-size:clamp(1.25rem,2.5vw,2rem);font-weight:800;line-height:1.55;letter-spacing:0;max-width:420px;}
+    .hero-meta{font-size:.88rem;line-height:1.8;color:var(--ink-2);font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
+    .hero-actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.4rem;}
+    .hero-cta{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:46px;padding:.78rem 1.05rem;border-radius:8px;
+      background:var(--green);color:#fff;font-weight:800;border:2px solid var(--ink);
+      box-shadow:5px 5px 0 var(--ink);transition:transform .2s,box-shadow .2s;
+    }
+    .hero-cta:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink);}
+    .hero-scroll{position:absolute;right:2rem;bottom:1.5rem;z-index:3;font-size:.65rem;letter-spacing:.14em;color:var(--ink-3);font-weight:800;text-transform:uppercase;}
 
     /* ===== COMMON ===== */
-    .sec{padding:7rem 0;}
-    .sec-warm{background:#f7f5f2;}
-    .sec-white{background:var(--white);}
-    .container{max-width:1000px;margin:0 auto;padding:0 2rem;}
-    .container-sm{max-width:660px;margin:0 auto;padding:0 2rem;}
-    .text-center{text-align:center;}
-
-    .sec-eyebrow{font-size:0.62rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;margin-bottom:0.8rem;}
-    .ey-blue{color:var(--blue);}
-    .ey-coral{color:var(--coral);}
-    .ey-violet{color:var(--violet);}
-    .ey-mint{color:var(--mint);}
-    .sec-title{font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,3.5vw,2.4rem);font-weight:700;line-height:1.6;margin-bottom:1.2rem;}
-    .sec-lead{font-size:0.93rem;color:var(--text2);font-weight:400;line-height:2.2;margin-bottom:2rem;max-width:540px;}
-    .text-center .sec-lead{margin-left:auto;margin-right:auto;}
-
-    /* ===== PHOTO BREAK ===== */
-    .photo-break{position:relative;height:55vh;min-height:340px;max-height:520px;overflow:hidden;}
-    .photo-break img{filter:brightness(0.7);}
-    .photo-break-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;}
-    .photo-break-overlay p{font-family:'Noto Serif JP',serif;font-size:clamp(1.15rem,2.8vw,1.7rem);font-weight:500;color:#fff;line-height:2;max-width:500px;text-shadow:0 2px 30px rgba(0,0,0,0.4);}
+    .sec{padding:7.5rem 0;position:relative;}
+    .sec-paper{background:rgba(251,253,248,.94);}
+    .sec-white{background:#fff;}
+    .sec-deep{background:var(--paper-deep);}
+    .container{max-width:1180px;margin:0 auto;padding:0 clamp(1.2rem,4vw,2.5rem);}
+    .container-sm{max-width:820px;margin:0 auto;padding:0 clamp(1.2rem,4vw,2.5rem);}
+    .label{
+      display:inline-flex;align-items:center;gap:.62rem;margin-bottom:1.15rem;
+      color:var(--ink-2);font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    }
+    .label::before{content:"";width:22px;height:8px;background:var(--coral);box-shadow:10px 7px 0 var(--sky);}
+    .label .num{display:inline-grid;place-items:center;width:28px;height:28px;border:1px solid var(--ink);background:var(--lime);color:var(--ink);font-size:.72rem;letter-spacing:0;border-radius:6px;}
+    .h-title{font-size:clamp(1.8rem,4vw,3rem);line-height:1.45;letter-spacing:0;font-weight:800;color:var(--ink);margin-bottom:1.2rem;}
+    .h-title .it{font-family:'Noto Serif JP',serif;font-weight:600;font-style:normal;color:var(--coral);background:linear-gradient(transparent 62%,var(--lime-soft) 62%);padding:0 .04em;white-space:nowrap;}
+    .h-title .em{font-weight:800;}
+    .h-lead{font-size:1.08rem;color:var(--ink-2);line-height:2.05;letter-spacing:0;max-width:660px;}
 
     /* ===== EMPATHY ===== */
-    .empathy-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;margin-top:2.5rem;}
-    .empathy-photo{border-radius:20px;overflow:hidden;aspect-ratio:4/5;max-height:500px;}
-    .empathy-poem{font-family:'Noto Serif JP',serif;font-size:0.93rem;line-height:2.5;color:var(--text2);font-weight:300;margin-bottom:2rem;padding-left:1.2rem;border-left:2px solid var(--blue-pale);}
+    .empathy{display:grid;grid-template-columns:minmax(280px,5fr) minmax(0,7fr);gap:4rem;align-items:start;margin-top:3.5rem;}
+    .empathy-photo{position:relative;aspect-ratio:4/5;overflow:hidden;border:2px solid var(--ink);box-shadow:10px 10px 0 var(--sky-soft);}
+    .empathy-photo img{filter:saturate(1.06) contrast(1.02);}
+    .empathy-photo-caption{display:flex;justify-content:space-between;gap:1rem;margin-top:1rem;color:var(--ink-3);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+    .empathy-body{padding-top:.4rem;}
+    .empathy-poem{font-size:1.16rem;line-height:2.25;color:var(--ink);margin-bottom:2rem;font-weight:700;}
+    .empathy-poem .drop{float:left;font-family:'Inter',sans-serif;font-size:3.2rem;line-height:.9;padding:.18em .18em 0 0;color:var(--sky);font-weight:800;}
+    .voice-list{display:grid;gap:.8rem;}
+    .voice-item{display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:start;padding:1.1rem 1.2rem;background:#fff;border:1px solid var(--line);border-left:7px solid var(--coral);border-radius:8px;box-shadow:0 8px 24px rgba(30,50,70,.06);color:var(--ink-2);font-size:1.04rem;line-height:1.8;}
+    .voice-item .v-num{font-weight:800;color:var(--sky);font-size:.82rem;padding-top:.18rem;}
+    .answer{margin-top:1.4rem;padding:1.2rem 1.4rem;background:var(--ink);color:#fff;border-radius:8px;box-shadow:8px 8px 0 var(--lime);}
+    .answer p{font-size:1.1rem;line-height:1.9;font-weight:700;}
+    .answer strong{color:var(--lime);font-weight:800;}
 
-    .voice-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-    .voice-item{display:flex;align-items:center;gap:0.8rem;padding:0.9rem 1.2rem;border-radius:12px;background:var(--white);border:1px solid var(--border);font-size:0.85rem;color:var(--text2);transition:box-shadow 0.3s;}
-    .voice-item:hover{box-shadow:0 4px 16px rgba(0,0,0,0.04);}
-    .v-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    /* ===== PHOTO BAND ===== */
+    .photo-band{position:relative;height:48vh;min-height:330px;max-height:500px;overflow:hidden;background:var(--ink);}
+    .photo-band img{filter:brightness(.66) saturate(1.06) contrast(1.04);}
+    .photo-band::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(23,33,43,.75),rgba(23,33,43,.18));}
+    .photo-band-text{position:absolute;inset:0;z-index:2;display:flex;align-items:center;padding:0 clamp(1.2rem,4vw,2.5rem);}
+    .photo-band-inner{max-width:1180px;margin:0 auto;width:100%;color:#fff;}
+    .photo-band-en{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(2rem,5vw,4.2rem);line-height:1.02;letter-spacing:0;margin-bottom:.9rem;max-width:700px;}
+    .photo-band-en em{font-style:normal;color:var(--lime);}
+    .photo-band-ja{font-weight:700;font-size:clamp(.95rem,1.8vw,1.12rem);line-height:1.9;max-width:560px;color:rgba(255,255,255,.9);}
 
-    .answer-banner{margin-top:2rem;padding:1.8rem;border-radius:16px;text-align:center;background:linear-gradient(135deg,var(--blue-pale),var(--violet-pale));}
-    .answer-banner p{font-size:1rem;color:var(--text);line-height:2;}
-    .answer-banner strong{font-weight:900;color:var(--blue);}
+    /* ===== CONCEPT ===== */
+    .concept{text-align:center;}
+    .concept .h-title,.concept .h-lead{margin-left:auto;margin-right:auto;}
+    .concept-mark{display:grid;grid-template-columns:1fr auto 1fr;gap:1.2rem;align-items:center;margin:3.8rem auto 3rem;max-width:760px;}
+    .concept-side{padding:1.5rem;background:#fff;border:2px solid var(--ink);border-radius:8px;box-shadow:7px 7px 0 var(--coral-soft);text-align:center;}
+    .concept-side.to{box-shadow:7px 7px 0 var(--sky-soft);}
+    .concept-side .word-en{font-family:'Inter',sans-serif;font-size:clamp(1.7rem,4vw,2.6rem);font-weight:800;line-height:1;color:var(--ink);}
+    .concept-side .word-ja{margin-top:.55rem;font-size:.86rem;font-weight:800;color:var(--ink-2);letter-spacing:.12em;}
+    .concept-line{width:76px;height:3px;background:var(--ink);position:relative;}
+    .concept-line::after{content:"";position:absolute;right:-2px;top:-6px;width:14px;height:14px;border-top:3px solid var(--ink);border-right:3px solid var(--ink);transform:rotate(45deg);}
+    .concept-flow-caption{margin:-1.7rem auto 1.7rem;color:var(--sky);font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;}
+    .concept-quote{max-width:650px;margin:0 auto;padding:1.4rem 1.6rem;background:var(--lime-soft);border:1px solid var(--line-strong);border-radius:8px;color:var(--ink-2);font-weight:700;line-height:2;}
+    .concept-quote strong{color:var(--ink);font-weight:800;}
 
-    /* ===== CONCEPT VISUAL ===== */
-    .concept-visual{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin:3rem 0;flex-wrap:wrap;}
-    .cv-bubble{text-align:center;padding:1.4rem 2.4rem;border-radius:60px;min-width:140px;}
-    .cv-from{background:var(--coral-pale);}
-    .cv-to{background:var(--blue-pale);}
-    .cv-label{font-size:0.55rem;color:var(--text3);letter-spacing:0.18em;font-weight:700;}
-    .cv-val{font-size:1.6rem;font-weight:900;}
-    .cv-from .cv-val{color:var(--coral);}
-    .cv-to .cv-val{color:var(--blue);}
-    .cv-arrow{width:32px;height:32px;color:var(--text3);}
+    /* ===== MENU ===== */
+    .menu-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2rem;align-items:end;margin-bottom:3rem;}
+    .menu-head-right{text-align:right;}
+    .menu-head-num{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(2.8rem,8vw,6.2rem);line-height:.9;color:var(--sky);opacity:.18;letter-spacing:0;}
+    .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;}
+    .menu-card{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 12px 32px rgba(30,50,70,.08);transition:transform .28s,box-shadow .28s;}
+    .menu-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);}
+    .menu-photo{position:relative;aspect-ratio:4/3;overflow:hidden;}
+    .menu-photo img{filter:saturate(1.06) contrast(1.02);transition:transform .8s cubic-bezier(.2,.7,.3,1);}
+    .menu-card:hover .menu-photo img{transform:scale(1.04);}
+    .menu-photo-num{position:absolute;left:1rem;top:1rem;display:grid;place-items:center;width:42px;height:42px;background:var(--lime);border:2px solid var(--ink);color:var(--ink);font-size:.85rem;font-weight:800;border-radius:8px;box-shadow:4px 4px 0 rgba(23,33,43,.72);}
+    .menu-tag{padding:1.2rem 1.25rem 0;color:var(--sky);font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;}
+    .menu-title{padding:0 1.25rem;margin:.4rem 0 .65rem;font-size:1.32rem;line-height:1.55;font-weight:800;color:var(--ink);}
+    .menu-title .it{font-family:'Noto Serif JP',serif;font-style:normal;color:var(--coral);font-weight:600;}
+    .menu-body{padding:0 1.25rem 1rem;color:var(--ink-2);font-size:1rem;line-height:1.9;}
+    .menu-meta{margin:0 1.25rem 1.25rem;padding:.8rem .9rem;background:var(--paper-deep);border-radius:8px;color:var(--ink-3);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+    .menu-meta strong{color:var(--ink);}
 
-    /* ===== PILLARS ===== */
-    .pillars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin:3rem 0;}
-    .p-card{background:var(--white);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:transform 0.3s,box-shadow 0.3s;}
-    .p-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.08);}
-    .p-card-img{height:200px;overflow:hidden;}
-    .p-card-img img{transition:transform 0.6s;}
-    .p-card:hover .p-card-img img{transform:scale(1.05);}
-    .p-card-body{padding:1.5rem;}
-    .p-num{font-size:0.58rem;font-weight:900;letter-spacing:0.15em;color:var(--text3);margin-bottom:0.3rem;}
-    .p-card h3{font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:700;margin-bottom:0.3rem;line-height:1.5;}
-    .p-card p.desc{font-size:0.8rem;color:var(--text3);line-height:1.8;}
+    /* ===== RULES ===== */
+    .rules-head{text-align:center;margin-bottom:3rem;}
+    .rules-head .h-lead{margin-left:auto;margin-right:auto;text-align:center;}
+    .rules-list{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;max-width:1120px;margin:0 auto;}
+    .rule-row{display:grid;grid-template-columns:auto 1fr;gap:1.25rem;padding:1.65rem;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 14px 32px rgba(30,50,70,.07);}
+    .rule-num{display:grid;place-items:center;width:44px;height:44px;background:var(--coral-soft);border:1px solid var(--line-strong);border-radius:8px;color:var(--coral);font-size:.9rem;font-weight:800;}
+    .rule-title{font-size:1.36rem;line-height:1.45;font-weight:800;color:var(--ink);margin-bottom:.32rem;}
+    .rule-en{font-size:.84rem;color:var(--sky);font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.45rem;}
+    .rule-body{font-size:1rem;color:var(--ink-2);line-height:1.9;}
 
-    .p-details{display:flex;flex-direction:column;gap:1.2rem;}
-    .p-detail{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.8rem 2rem;transition:box-shadow 0.3s;}
-    .p-detail:hover{box-shadow:0 4px 20px rgba(0,0,0,0.04);}
-    .p-detail-head{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.5rem;}
-    .p-detail-num{width:28px;height:28px;border-radius:8px;font-size:0.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-    .p-detail:nth-child(1) .p-detail-num{background:var(--mint-pale);color:var(--mint);}
-    .p-detail:nth-child(2) .p-detail-num{background:var(--blue-pale);color:var(--blue);}
-    .p-detail:nth-child(3) .p-detail-num{background:var(--violet-pale);color:var(--violet);}
-    .p-detail h4{font-family:'Noto Serif JP',serif;font-size:1.05rem;font-weight:700;}
-    .p-detail-sub{font-size:0.78rem;color:var(--coral);margin-bottom:0.4rem;}
-    .p-detail-body{font-size:0.88rem;color:var(--text2);line-height:2.1;}
-    .p-detail-body strong{color:var(--text);font-weight:700;}
-    .p-detail-info{margin-top:0.8rem;padding:0.8rem 1rem;background:var(--bg);border-radius:10px;font-size:0.76rem;color:var(--text3);}
-    .p-detail-info .time{color:var(--blue);font-weight:700;}
-    .p-detail-info ul{list-style:none;margin-top:0.3rem;}
-    .p-detail-info li{padding:0.15rem 0 0.15rem 1rem;position:relative;}
-    .p-detail-info li::before{content:'—';position:absolute;left:0;color:var(--blue-soft);}
-
-    /* ===== STEPS ===== */
-    .steps-row{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:0;margin:3rem 0;}
-    .step-card{background:var(--white);border:1px solid var(--border);border-radius:18px;overflow:hidden;text-align:center;transition:transform 0.3s,box-shadow 0.3s;}
-    .step-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.06);}
-    .step-img{height:150px;overflow:hidden;}
-    .step-img img{transition:transform 0.6s;}
-    .step-card:hover .step-img img{transform:scale(1.05);}
-    .step-body{padding:1.2rem 1rem;}
-    .step-label{font-size:0.58rem;font-weight:900;letter-spacing:0.15em;color:var(--text3);margin-bottom:0.3rem;}
-    .step-card h3{font-family:'Noto Serif JP',serif;font-size:0.92rem;font-weight:700;margin-bottom:0.2rem;line-height:1.5;}
-    .step-card p{font-size:0.78rem;color:var(--text3);line-height:1.7;}
-    .step-arrow{display:flex;align-items:center;justify-content:center;padding:0 0.4rem;}
-    .step-arrow svg{width:22px;height:22px;stroke:var(--text3);fill:none;stroke-width:1.5;opacity:0.35;}
+    /* ===== JOIN FLOW ===== */
+    .join-sec{background:linear-gradient(180deg,#fff 0%,var(--paper-deep) 100%);}
+    .join-head{text-align:center;max-width:760px;margin:0 auto 3rem;}
+    .join-head .h-lead{margin-left:auto;margin-right:auto;text-align:center;}
+    .join-flow{display:grid;grid-template-columns:1fr 92px 1fr;align-items:stretch;gap:1rem;margin:0 auto;max-width:1040px;}
+    .flow-card{
+      display:grid;grid-template-rows:auto auto 1fr auto;gap:.8rem;
+      background:#fff;border:2px solid var(--ink);border-radius:8px;padding:1.35rem;
+      box-shadow:10px 10px 0 var(--lime);
+      min-height:300px;
+    }
+    .flow-card:nth-of-type(2){box-shadow:10px 10px 0 var(--sky-soft);}
+    .flow-kicker{display:flex;align-items:center;justify-content:space-between;gap:.8rem;font-size:.76rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
+    .flow-badge{display:grid;place-items:center;width:48px;height:48px;background:var(--ink);color:#fff;border-radius:8px;font-size:1.05rem;font-weight:800;}
+    .flow-card h3{font-size:clamp(1.35rem,2.6vw,1.8rem);line-height:1.35;font-weight:800;color:var(--ink);}
+    .flow-card p{color:var(--ink-2);font-size:.98rem;line-height:1.9;}
+    .flow-visual{display:grid;grid-template-columns:58px 1fr;gap:.9rem;align-items:center;margin-top:.5rem;padding:1rem;background:var(--paper);border:1px solid var(--line);border-radius:8px;}
+    .flow-phone{height:104px;border:2px solid var(--ink);border-radius:8px;background:#fff;position:relative;box-shadow:4px 4px 0 var(--coral-soft);}
+    .flow-phone::before{content:"";position:absolute;left:50%;top:7px;transform:translateX(-50%);width:18px;height:3px;background:var(--ink);border-radius:3px;}
+    .flow-phone::after{content:"LINE";position:absolute;left:8px;right:8px;top:34px;padding:.42rem .25rem;background:var(--green);color:#fff;border-radius:6px;text-align:center;font-size:.68rem;font-weight:800;}
+    .flow-mini{display:grid;gap:.45rem;}
+    .flow-mini span{display:block;height:10px;border-radius:4px;background:var(--sky-soft);}
+    .flow-mini span:nth-child(2){width:72%;background:var(--lime);}
+    .flow-mini span:nth-child(3){width:86%;background:var(--coral-soft);}
+    .flow-arrow{display:grid;place-items:center;align-self:center;min-height:92px;}
+    .flow-arrow span{position:relative;width:68px;height:4px;background:var(--ink);}
+    .flow-arrow span::before,.flow-arrow span::after{content:"";position:absolute;right:0;width:18px;height:4px;background:var(--ink);transform-origin:right center;}
+    .flow-arrow span::before{transform:rotate(40deg);}
+    .flow-arrow span::after{transform:rotate(-40deg);}
+    .join-strip{display:flex;justify-content:center;gap:.7rem;flex-wrap:wrap;margin:2.2rem auto 1.5rem;}
+    .join-strip span{display:inline-flex;align-items:center;min-height:34px;padding:.38rem .75rem;background:#fff;border:1px solid var(--line-strong);border-radius:8px;color:var(--ink);font-size:.82rem;font-weight:800;}
+    .join-actions{text-align:center;}
+    .join-btn,.cta-btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:.75rem;
+      min-height:54px;padding:.9rem 1.35rem;background:var(--green);color:#fff;
+      border:2px solid var(--ink);border-radius:8px;font-size:1rem;font-weight:800;
+      box-shadow:7px 7px 0 var(--ink);transition:transform .2s,box-shadow .2s,background .2s;
+    }
+    .join-btn:hover,.cta-btn:hover{background:#05b84e;transform:translate(-2px,-2px);box-shadow:9px 9px 0 var(--ink);}
+    .join-btn svg,.cta-btn svg{width:22px;height:22px;fill:currentColor;flex:0 0 auto;}
 
     /* ===== INVITATION ===== */
-    .invite-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem;}
-    .invite-card{background:var(--white);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:box-shadow 0.3s;}
-    .invite-card:hover{box-shadow:0 8px 30px rgba(0,0,0,0.06);}
-    .invite-photo{height:220px;overflow:hidden;}
-    .invite-photo img{transition:transform 0.6s;}
-    .invite-card:hover .invite-photo img{transform:scale(1.03);}
-    .invite-body-wrap{padding:2rem 1.8rem;}
-    .invite-for{font-size:0.58rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.6rem;}
-    .invite-card.front .invite-for{color:var(--blue);}
-    .invite-card.bansou .invite-for{color:var(--coral);}
-    .invite-card h3{font-family:'Noto Serif JP',serif;font-size:1.1rem;font-weight:700;margin-bottom:1rem;line-height:1.7;}
-    .invite-body{font-size:0.86rem;color:var(--text2);line-height:2.2;}
-    .invite-body strong{color:var(--text);font-weight:700;}
-    .invite-body .accent{display:block;font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:700;color:var(--blue);margin:0.6rem 0;}
+    .letters{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:3rem;}
+    .letter{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 12px 32px rgba(30,50,70,.08);}
+    .letter-photo{aspect-ratio:16/10;overflow:hidden;}
+    .letter-photo img{filter:saturate(1.05) contrast(1.02);}
+    .letter-role{display:inline-flex;margin:1.35rem 1.4rem .2rem;padding:.4rem .72rem;border-radius:8px;background:var(--lime);border:1px solid var(--ink);color:var(--ink);font-size:.86rem;font-weight:800;letter-spacing:.04em;}
+    .letter-role.support{background:var(--sky-soft);}
+    .letter-tag{padding:.75rem 1.4rem 0;color:var(--sky);font-size:.82rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
+    .letter-title{padding:0 1.4rem;margin:.5rem 0 1rem;font-size:clamp(1.35rem,2.5vw,1.82rem);line-height:1.5;font-weight:800;color:var(--ink);}
+    .letter-title .it{font-family:'Noto Serif JP',serif;font-style:normal;color:var(--coral);font-weight:600;}
+    .letter-body{padding:0 1.4rem 1.4rem;color:var(--ink-2);font-size:1rem;line-height:2;}
+    .letter-body p+p{margin-top:1rem;}
+    .letter-body em{font-style:normal;font-weight:800;color:var(--ink);background:linear-gradient(transparent 62%,var(--lime-soft) 62%);}
+    .letter-signature{padding:0 1.4rem 1.4rem;color:var(--ink-3);font-size:.82rem;font-weight:800;}
 
     /* ===== CTA ===== */
-    .cta-sec{text-align:center;padding:6rem 2rem 7rem;}
-    .cta-title{font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,4vw,2.4rem);font-weight:700;margin-bottom:0.8rem;}
-    .cta-title .blue{color:var(--blue);}
-    .cta-sub{font-size:0.9rem;color:var(--text2);margin-bottom:2.5rem;line-height:2;}
-    .cta-btn{display:inline-flex;align-items:center;gap:0.7rem;background:#06c755;color:#fff;font-size:1rem;font-weight:700;padding:1.1rem 2.4rem;border-radius:980px;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 4px 20px rgba(6,199,85,0.25);}
-    .cta-btn:hover{transform:scale(1.03);box-shadow:0 8px 32px rgba(6,199,85,0.35);}
-    .cta-btn svg{width:20px;height:20px;fill:#fff;}
-    .cta-note{margin-top:1rem;font-size:0.7rem;color:var(--text3);}
+    .cta-sec{padding:7rem 1.2rem;background:var(--ink);color:#fff;text-align:center;position:relative;overflow:hidden;}
+    .cta-sec::before{content:"";position:absolute;inset:0;opacity:.16;background:linear-gradient(rgba(255,255,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:42px 42px;}
+    .cta-inner{position:relative;z-index:1;max-width:760px;margin:0 auto;}
+    .cta-rule{display:block;width:74px;height:8px;background:var(--lime);box-shadow:18px 12px 0 var(--coral);margin:0 auto 2rem;}
+    .cta-eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--lime);font-weight:800;margin-bottom:1rem;}
+    .cta-title{font-family:'Inter',sans-serif;font-size:clamp(2.4rem,6vw,4.8rem);line-height:1;font-weight:800;letter-spacing:0;margin-bottom:1.1rem;}
+    .cta-title .ac{color:var(--lime);}
+    .cta-sub-ja{font-size:1rem;line-height:2;color:rgba(255,255,255,.84);font-weight:700;margin-bottom:2rem;}
+    .cta-note{margin-top:1.4rem;color:rgba(255,255,255,.64);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
 
     /* ===== FOOTER ===== */
-    footer{border-top:1px solid var(--border);padding:2.5rem 2rem;text-align:center;}
-    .f-orgs{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;margin-bottom:0.8rem;}
-    .f-org{font-size:0.72rem;color:var(--text3);}
-    .f-org .name{color:var(--text2);font-weight:700;}
-    .f-info{font-size:0.66rem;color:var(--text3);}
-    .f-copy{margin-top:1rem;font-size:0.6rem;color:var(--text3);}
+    footer{padding:3.4rem 1.2rem;text-align:center;background:#fff;border-top:1px solid var(--line);}
+    .f-logo{font-size:1.35rem;font-weight:800;color:var(--ink);margin-bottom:.2rem;}
+    .f-logo-ja{font-size:.82rem;font-weight:800;color:var(--ink-2);letter-spacing:.12em;margin-bottom:2rem;}
+    .f-orgs{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+    .f-org{font-size:.86rem;color:var(--ink-2);line-height:1.9;font-weight:700;}
+    .f-org .name{display:block;color:var(--ink);font-weight:800;font-size:.95rem;margin-bottom:.15rem;}
+    .f-info{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:800;}
+    .f-copy{margin-top:1rem;font-size:.72rem;color:var(--ink-3);font-weight:700;}
 
-    /* ===== ANIMATION (CSS-only with scroll-driven) ===== */
-    @keyframes fadeUp{from{opacity:0;transform:translateY(36px);}to{opacity:1;transform:translateY(0);}}
-    .reveal{animation:fadeUp 0.8s cubic-bezier(.25,.46,.45,.94) both;animation-timeline:view();animation-range:entry 0% entry 30%;}
-    .reveal-d1{animation-delay:.12s;}.reveal-d2{animation-delay:.24s;}.reveal-d3{animation-delay:.36s;}
-    /* Fallback for browsers without scroll-timeline */
-    @supports not (animation-timeline:view()){
-      .reveal{opacity:1;transform:none;animation:none;}
+    /* ===== ANIMATION ===== */
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1);}
+    .reveal.in{opacity:1;transform:translateY(0);}
+    .reveal-d1{transition-delay:.1s;}
+    .reveal-d2{transition-delay:.2s;}
+    .reveal-d3{transition-delay:.3s;}
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:920px){
+      .nav-meta{display:none;}
+      .hero{height:90svh;min-height:560px;}
+      .hero-content{padding:6rem 1.4rem 3rem;}
+      .hero-grid{grid-template-columns:1fr;gap:1.6rem;}
+      .hero-title .b{padding-left:.28em;}
+      .empathy{grid-template-columns:1fr;gap:2.4rem;}
+      .menu-head{grid-template-columns:1fr;gap:1rem;}
+      .menu-head-right{text-align:left;}
+      .menu-grid,.letters,.rules-list{grid-template-columns:1fr;}
+      .join-flow{grid-template-columns:1fr;gap:1.2rem;}
+      .flow-arrow{min-height:44px;}
+      .flow-arrow span{width:4px;height:48px;}
+      .flow-arrow span::before,.flow-arrow span::after{right:auto;bottom:0;width:18px;transform-origin:center bottom;}
+      .flow-arrow span::before{left:-13px;transform:rotate(45deg);}
+      .flow-arrow span::after{right:-13px;transform:rotate(-45deg);}
+      .concept-mark{grid-template-columns:1fr;max-width:430px;}
+      .concept-line{width:3px;height:54px;margin:0 auto;}
+      .concept-line::after{right:-6px;top:auto;bottom:-2px;transform:rotate(135deg);}
+      .sec{padding:5.5rem 0;}
+    }
+    @media(max-width:560px){
+      .nav{padding:.75rem .9rem;}
+      .nav-brand{font-size:.92rem;}
+      .nav-cta{font-size:.72rem;padding:.42rem .62rem;}
+      .hero{min-height:520px;}
+      .hero-scroll{display:none;}
+      .hero-tagline{font-size:1.2rem;}
+      .h-title{font-size:1.95rem;}
+      .photo-band{height:42vh;min-height:280px;}
+      .flow-card{min-height:0;padding:1.1rem;box-shadow:7px 7px 0 var(--lime);}
+      .flow-card:nth-of-type(2){box-shadow:7px 7px 0 var(--sky-soft);}
+      .join-btn,.cta-btn{width:100%;padding:.88rem 1rem;}
+      .f-orgs{gap:1.2rem;}
+    }
+    @media(max-height:620px){
+      .hero{min-height:0;height:88svh;}
+      .hero-title{font-size:clamp(2.6rem,8vw,4.8rem);}
+      .hero-content{padding-bottom:2rem;}
     }
 
-    @media(max-width:768px){
-      .empathy-grid,.invite-grid{grid-template-columns:1fr;}
-      .pillars-grid{grid-template-columns:1fr;}
-      .steps-row{grid-template-columns:1fr;gap:1rem;}
-      .step-arrow{transform:rotate(90deg);padding:0;}
-      .sec{padding:5rem 0;}
-      .container,.container-sm{padding:0 1.5rem;}
-      .photo-break{height:35vh;min-height:240px;}
-    }
-    @media(max-width:480px){
-      .concept-visual{flex-direction:column;}
-      .cv-arrow{transform:rotate(90deg);}
-    }
   </style>
 </head>
 <body>
 
+<!-- ===== NAV ===== -->
+<nav class="nav">
+  <div class="nav-brand">Synapse Cafe</div>
+  <div class="nav-meta">Middle & High School · Aug → Dec 2026</div>
+  <a class="nav-cta" href="#join">LINEまで2ステップ</a>
+</nav>
+
 <!-- ===== HERO ===== -->
 <section class="hero">
-  <div class="hero-bg"><img src="images/hero.jpg" alt=""></div>
+  <div class="hero-img"><img src="images/invite1.jpg" alt="図書館で笑顔で学び合う学生たち"></div>
+  <div class="hero-grad"></div>
   <div class="hero-content">
-    <p class="hero-eyebrow">4ヶ月 伴走型プロジェクト &ensp;|&ensp; 2026.08 — 12</p>
-    <h1 class="hero-title">脳の学校</h1>
-    <p class="hero-subtitle serif">あの日の「変わりたい」を、<br>本当に変わる4ヶ月へ。</p>
-    <p class="hero-desc">脳科学 &times; 伴走。<br>きみの中に生まれた火を、消させない。</p>
-    <p class="hero-meta">DAncing Einstein &times; E3 Habit</p>
-    <a href="#join" class="hero-cta">参加方法を見る <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">Brain × Habit Lab</div>
+        <h1 class="hero-title">
+          <span class="a">Synapse</span>
+          <span class="b">Cafe.</span>
+        </h1>
+        <p class="hero-ja">中高生のための、脳と習慣のラボ</p>
+      </div>
+      <div class="hero-right">
+        <p class="hero-tagline">「気になる」を、<br>続く学びに変える。</p>
+        <p class="hero-meta">4 months · free · anonymous OK<br>DAncing Einstein × E3 Habit</p>
+        <div class="hero-actions">
+          <a class="hero-cta" href="#join">LINEまでの2ステップを見る</a>
+        </div>
+      </div>
+    </div>
   </div>
+  <div class="hero-scroll">SCROLL</div>
 </section>
 
 <!-- ===== EMPATHY ===== -->
-<div class="sec sec-white">
+<section class="sec sec-paper">
 <div class="container">
   <div class="reveal">
-    <p class="sec-eyebrow ey-coral">Question</p>
-    <h2 class="sec-title serif">「すごい体験だった」──<br>で、終わっていないか。</h2>
+    <div class="label"><span class="num">01</span>Question</div>
+    <h2 class="h-title serif">あのときの「<span class="it">やってみたい</span>」、<br>まだ消えてない？</h2>
   </div>
-  <div class="empathy-grid">
-    <div class="empathy-photo reveal"><img src="images/empathy.jpg" alt="" loading="lazy"></div>
+  <div class="empathy">
     <div class="reveal reveal-d1">
-      <div class="empathy-poem">ツアーで聴いた話に、心が震えた。<br>「自分も変われるかもしれない」と、確かに思った。<br><br>でも、月曜日が来て、火曜日が来て、<br>いつもの教室、いつもの日常に戻ったとき──<br>あの熱量は、いつの間にか冷めていた。</div>
-      <div class="voice-list">
-        <div class="voice-item"><div class="v-dot" style="background:var(--blue)"></div>やりたいことがある。でも、何から始めればいいか分からない</div>
-        <div class="voice-item"><div class="v-dot" style="background:var(--violet)"></div>一人で続けるのが、しんどい</div>
-        <div class="voice-item"><div class="v-dot" style="background:var(--coral)"></div>周りに話しても、なんか伝わらない</div>
+      <div class="empathy-photo"><img src="images/empathy.jpg" alt="考えをノートに書き出す学生"></div>
+      <div class="empathy-photo-caption">
+        <span>Fig. 01</span>
+        <span>Think, Try, Repeat</span>
       </div>
-      <div class="answer-banner">
-        <p>それは、きみが弱いからじゃない。<br>脳が変わるには、<strong>"仕組み"</strong>がいるだけだ。</p>
+    </div>
+    <div class="empathy-body reveal reveal-d2">
+      <p class="empathy-poem">
+        <span class="drop">あ</span>のとき、誰かの話に心が動いた。<br>
+        「自分も、ちょっと変わりたい」と思った。<br><br>
+        でも宿題、部活、テスト、スマホ。<br>
+        気づいたら、いつもの毎日に戻っていた。
+      </p>
+      <div class="voice-list">
+        <div class="voice-item">
+          <span class="v-num">i.</span>
+          <span>やりたいことはある。けれど、最初の一歩がぼんやりしている。</span>
+        </div>
+        <div class="voice-item">
+          <span class="v-num">ii.</span>
+          <span>ひとりで続けるのは、思っていたよりしんどい。</span>
+        </div>
+        <div class="voice-item">
+          <span class="v-num">iii.</span>
+          <span>学校や家だけだと、自分の興味を話す場所が少ない。</span>
+        </div>
+      </div>
+      <div class="answer">
+        <p>それは、あなたが弱いからじゃない。<br>脳はそもそも、<strong>仲間と環境で続きやすくなる</strong>ようにできている。</p>
       </div>
     </div>
   </div>
 </div>
-</div>
+</section>
 
-<!-- Photo Break 1 -->
-<div class="photo-break">
-  <img src="images/break1.jpg" alt="" loading="lazy">
-  <div class="photo-break-overlay">
-    <p>ひとりで走らなくていい。<br>きみの隣には、<strong>伴走者</strong>がいる。</p>
+<!-- ===== PHOTO BAND 1 ===== -->
+<div class="photo-band">
+  <img src="images/hero.jpg" alt="集中してノートを書く学生">
+  <div class="photo-band-text">
+    <div class="photo-band-inner">
+      <p class="photo-band-en latin">Curiosity works better<br><em>when it has a place.</em></p>
+      <p class="photo-band-ja serif">ひとりでがんばりきらなくていい。<br>興味が続く場所を、先につくっておこう。</p>
+    </div>
   </div>
 </div>
 
 <!-- ===== CONCEPT ===== -->
-<div class="sec sec-warm">
-<div class="container-sm text-center">
-  <div class="reveal">
-    <p class="sec-eyebrow ey-blue">Concept</p>
-    <h2 class="sec-title serif">熱狂を、習慣に書き換える。</h2>
-    <p class="sec-lead">脳科学者・青砥瑞人が提唱する「神経可塑性」──脳は繰り返しの刺激で物理的に回路を書き換える。一度のインスピレーションでは変わらない。でも、正しいプロセスを踏めば、確実に変わる。</p>
+<section class="sec sec-white">
+<div class="container-sm">
+  <div class="concept reveal">
+    <div class="label" style="justify-content:center;"><span class="num">02</span>Concept</div>
+    <h2 class="h-title serif">ひらめきを、<span class="it">毎日の行動</span>に<br>変えていく場所。</h2>
+    <p class="h-lead">脳科学者・青砥瑞人が大切にしているのは、気合いよりも「続くしくみ」。<br>脳は、何度もくり返してようやく「自分のもの」にしていく。<br>小さく試して、言葉にして、また試す。そのサイクルを4ヶ月つくります。</p>
   </div>
-  <div class="concept-visual reveal">
-    <div class="cv-bubble cv-from"><div class="cv-label">FROM</div><div class="cv-val">熱狂</div></div>
-    <svg class="cv-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    <div class="cv-bubble cv-to"><div class="cv-label">TO</div><div class="cv-val">習慣</div></div>
+  <div class="concept-mark reveal reveal-d1">
+    <div class="concept-side from">
+      <div class="word-en">Spark</div>
+      <div class="word-ja">ひらめき</div>
+    </div>
+    <div class="concept-line"></div>
+    <div class="concept-side to">
+      <div class="word-en">Loop</div>
+      <div class="word-ja">続くしくみ</div>
+    </div>
   </div>
-  <p class="sec-lead reveal" style="margin-top:0">心理的安全性と承認。定点観測と小さな言語化。<br><strong style="color:var(--text)">孤独な挑戦を、確かな自己変容へ。</strong></p>
+  <p class="concept-flow-caption latin reveal reveal-d1">Spark to Loop</p>
+  <p class="concept-quote reveal reveal-d2">
+    安心して話せる場所と、ちいさな振り返り。<br>
+    <strong>それだけで、興味は「続けられる力」に変わっていく。</strong>
+  </p>
 </div>
+</section>
+
+<!-- ===== MENU ===== -->
+<section class="sec sec-paper">
+<div class="container">
+  <div class="menu-head">
+    <div class="reveal">
+      <div class="label"><span class="num">03</span>Menu</div>
+      <h2 class="h-title serif">シナプスカフェの、<br><span class="it">3つのしかけ。</span></h2>
+      <p class="h-lead">勉強っぽすぎない。でも、ちゃんと脳に残る。<br>自分のペースで参加できます。</p>
+    </div>
+    <div class="menu-head-right reveal reveal-d1">
+      <div class="menu-head-num latin">No.03</div>
+    </div>
+  </div>
+
+  <div class="menu-grid">
+    <article class="menu-card reveal reveal-d1">
+      <div class="menu-photo">
+        <span class="menu-photo-num latin">01</span>
+        <img src="images/pillar1.jpg" alt="LINEで気軽に話せるチャットのイメージ">
+      </div>
+      <div class="menu-tag">Item 01 — Chat</div>
+      <h3 class="menu-title serif">いつでも開ける<br><span class="it">思考のチャット</span></h3>
+      <p class="menu-body">LINEオープンチャットで、思いついた瞬間に置いておける。読むだけの日があっても大丈夫。</p>
+      <div class="menu-meta"><strong>Open</strong> · 24/7 · 匿名可</div>
+    </article>
+
+    <article class="menu-card reveal reveal-d2">
+      <div class="menu-photo">
+        <span class="menu-photo-num latin">02</span>
+        <img src="images/pillar2.jpg" alt="オンラインで振り返る学生たち">
+      </div>
+      <div class="menu-tag">Item 02 — Weekly</div>
+      <h3 class="menu-title serif">毎週土曜の<br><span class="it">45分リフレクション</span></h3>
+      <p class="menu-body">「今週の自分は何を試した？」を短く言葉にする時間。続けるコツを一緒に見つけます。</p>
+      <div class="menu-meta"><strong>Sat</strong> · 20:00 - 20:45</div>
+    </article>
+
+    <article class="menu-card reveal reveal-d3">
+      <div class="menu-photo">
+        <span class="menu-photo-num latin">03</span>
+        <img src="images/pillar3.jpg" alt="夜の勉強会で新しい視点を得るイメージ">
+      </div>
+      <div class="menu-tag">Item 03 — Spark</div>
+      <h3 class="menu-title serif">月に数回の<br><span class="it">脳科学ナイト</span></h3>
+      <p class="menu-body">脳科学の話や、先輩たちのリアルな体験談。詰まったときに、新しい視点が入ります。</p>
+      <div class="menu-meta"><strong>Monthly</strong> · アーカイブ有</div>
+    </article>
+  </div>
+</div>
+</section>
+
+<!-- ===== PHOTO BAND 2 ===== -->
+<div class="photo-band">
+  <img src="images/break2.jpg" alt="夕方の学び場に集まる人たち">
+  <div class="photo-band-text">
+    <div class="photo-band-inner">
+      <p class="photo-band-en latin">No perfect plan.<br><em>Just one more next move.</em></p>
+      <p class="photo-band-ja serif">完璧な計画はいらない。<br>「ちょっと気になる」から、次の一手を始めよう。</p>
+    </div>
+  </div>
 </div>
 
-<!-- ===== PILLARS ===== -->
-<div class="sec sec-white">
-<div class="container text-center">
-  <div class="reveal">
-    <p class="sec-eyebrow ey-violet">Program</p>
-    <h2 class="sec-title serif">きみの4ヶ月を支える、3つの仕組み。</h2>
+<!-- ===== RULES ===== -->
+<section class="sec sec-white">
+<div class="container">
+  <div class="rules-head reveal">
+    <div class="label" style="justify-content:center;"><span class="num">04</span>House Rules</div>
+    <h2 class="h-title serif">安心していられる、<br><span class="it">4つの</span>ルール。</h2>
+    <p class="h-lead" style="margin-left:auto;margin-right:auto;text-align:center;">うまく話せる人だけの場所ではありません。<br>考え中のまま、参加できます。</p>
   </div>
 
-  <div class="pillars-grid">
-    <div class="p-card reveal reveal-d1">
-      <div class="p-card-img"><img src="images/pillar1.jpg" alt="" loading="lazy"></div>
-      <div class="p-card-body">
-        <div class="p-num">01</div>
-        <h3>いつでも繋がれる居場所</h3>
-        <p class="desc">LINEオープンチャットで<br>心理的安全な場を提供</p>
+  <div class="rules-list">
+    <div class="rule-row reveal reveal-d1">
+      <div class="rule-num latin">i.</div>
+      <div>
+        <h3 class="rule-title">話さない日があってもいい</h3>
+        <p class="rule-en">You don't have to speak.</p>
+        <p class="rule-body">見ているだけ、聞いているだけでも参加です。<br>話したくなったら、そのとき話せば大丈夫。</p>
       </div>
     </div>
-    <div class="p-card reveal reveal-d2">
-      <div class="p-card-img"><img src="images/pillar2.jpg" alt="" loading="lazy"></div>
-      <div class="p-card-body">
-        <div class="p-num">02</div>
-        <h3>毎週土曜の定点観測</h3>
-        <p class="desc">45分のオンラインMTGで<br>振り返りと展望を言語化</p>
+    <div class="rule-row reveal reveal-d1">
+      <div class="rule-num latin">ii.</div>
+      <div>
+        <h3 class="rule-title">考え中のままでいい</h3>
+        <p class="rule-en">Half-formed is fine.</p>
+        <p class="rule-body">うまく言えないメモや途中の疑問こそ歓迎。<br>まだ名前のない興味を、そのまま置いていけます。</p>
       </div>
     </div>
-    <div class="p-card reveal reveal-d3">
-      <div class="p-card-img"><img src="images/pillar3.jpg" alt="" loading="lazy"></div>
-      <div class="p-card-body">
-        <div class="p-num">03</div>
-        <h3>突破のためのインプット</h3>
-        <p class="desc">オンライン勉強会で<br>停滞を突破するきっかけ</p>
+    <div class="rule-row reveal reveal-d2">
+      <div class="rule-num latin">iii.</div>
+      <div>
+        <h3 class="rule-title">誰も傷つけない</h3>
+        <p class="rule-en">No harm to others.</p>
+        <p class="rule-body">否定や中傷はナシ。<br>違う考えがあっても、まずは「そうなんだ」から始めます。</p>
+      </div>
+    </div>
+    <div class="rule-row reveal reveal-d2">
+      <div class="rule-num latin">iv.</div>
+      <div>
+        <h3 class="rule-title">いつ来ても、いつ帰ってもいい</h3>
+        <p class="rule-en">Come and go, freely.</p>
+        <p class="rule-body">毎週来なくていい。<br>気が向いたときだけで大丈夫。抜けるのも自由。</p>
       </div>
     </div>
   </div>
-
-  <div class="p-details" style="text-align:left;margin-top:2rem;">
-    <div class="p-detail reveal">
-      <div class="p-detail-head"><div class="p-detail-num">01</div><h4>会いたい時に会える居場所</h4></div>
-      <p class="p-detail-sub">ハードルは、限りなくゼロに。</p>
-      <p class="p-detail-body">LINEオープンチャットとグループで、いつでも仲間と繋がれる。「相談したい」と思った瞬間に開ける場所がある。わざわざ予約する必要も、改まる必要もない。<br><strong>ここは、きみの"安全基地"だ。</strong></p>
-    </div>
-    <div class="p-detail reveal">
-      <div class="p-detail-head"><div class="p-detail-num">02</div><h4>毎週土曜の定点観測</h4></div>
-      <p class="p-detail-sub">完璧じゃなくていい。言葉にし続けるだけでいい。</p>
-      <p class="p-detail-body">45分間のオンラインMTGで、先週を振り返り、今週を見据える。いきなり完璧を求めない。大人たちが「ちゃんと見ているよ」と伝え続ける。<br><strong>その繰り返しが、脳の回路を書き換えていく。</strong></p>
-      <div class="p-detail-info"><span class="time">毎週土曜 20:00 - 20:45</span>（2026年8月〜12月）<ul><li>先週の振り返り：やったこと、感じたこと、つまずいたこと</li><li>今週の展望：次の7日間で、ひとつだけ試すこと</li></ul></div>
-    </div>
-    <div class="p-detail reveal">
-      <div class="p-detail-head"><div class="p-detail-num">03</div><h4>突破のためのインプット</h4></div>
-      <p class="p-detail-sub">停滞は、新しい刺激で壊せる。</p>
-      <p class="p-detail-body">土曜の夜に数回のオンライン勉強会を開催。脳科学の知見や、先輩たちのリアルな体験談を共有する。<br>「もうダメかも」と思った時こそ、<strong>新しい視点が、きみの天井をぶち抜く。</strong></p>
-    </div>
-  </div>
 </div>
-</div>
-
-<!-- Photo Break 2 -->
-<div class="photo-break">
-  <img src="images/break2.jpg" alt="" loading="lazy">
-  <div class="photo-break-overlay">
-    <p>完璧な計画はいらない。<br>「なんか気になる」──その直感で十分だ。</p>
-  </div>
-</div>
+</section>
 
 <!-- ===== STEPS ===== -->
-<div class="sec sec-white" id="join">
-<div class="container text-center">
-  <div class="reveal">
-    <p class="sec-eyebrow ey-blue">How to Join</p>
-    <h2 class="sec-title serif">参加はかんたん、3ステップ。</h2>
+<section class="sec sec-paper join-sec" id="join">
+<div class="container">
+  <div class="join-head reveal">
+    <div class="label" style="justify-content:center;"><span class="num">05</span>LINE Flow</div>
+    <h2 class="h-title serif">LINEまでは、<span class="it">2ステップ。</span></h2>
+    <p class="h-lead">迷わないように、やることを2つだけにしました。スマホからそのまま参加できます。</p>
   </div>
-  <div class="steps-row reveal">
-    <div class="step-card">
-      <div class="step-img"><img src="images/step1.jpg" alt="" loading="lazy"></div>
-      <div class="step-body">
-        <div class="step-label">STEP 1</div>
-        <h3>このページを読む</h3>
-        <p>プロジェクトの全体像を知る</p>
+
+  <div class="join-flow" aria-label="LINE参加までの2ステップ">
+    <article class="flow-card reveal reveal-d1">
+      <div class="flow-kicker"><span>Step 01</span><span class="flow-badge">01</span></div>
+      <h3>このページのLINEボタンをタップ</h3>
+      <p>ボタンを押すと、LINEオープンチャットの参加画面が開きます。アプリが入っていれば、そのまま進めます。</p>
+      <div class="flow-visual" aria-hidden="true">
+        <div class="flow-phone"></div>
+        <div class="flow-mini"><span></span><span></span><span></span></div>
       </div>
-    </div>
-    <div class="step-arrow"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-    <div class="step-card">
-      <div class="step-img"><img src="images/step2.jpg" alt="" loading="lazy"></div>
-      <div class="step-body">
-        <div class="step-label">STEP 2</div>
-        <h3>LINEに登録する</h3>
-        <p>匿名OK・無料で参加</p>
+    </article>
+
+    <div class="flow-arrow" aria-hidden="true"><span></span></div>
+
+    <article class="flow-card reveal reveal-d2">
+      <div class="flow-kicker"><span>Step 02</span><span class="flow-badge">02</span></div>
+      <h3>ニックネームを決めて参加</h3>
+      <p>本名でなくてOK。プロフィール画像も自由です。入ったら、まずは読むだけでも大丈夫です。</p>
+      <div class="flow-visual" aria-hidden="true">
+        <div class="flow-phone"></div>
+        <div class="flow-mini"><span></span><span></span><span></span></div>
       </div>
-    </div>
-    <div class="step-arrow"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-    <div class="step-card">
-      <div class="step-img"><img src="images/step3.jpg" alt="" loading="lazy"></div>
-      <div class="step-body">
-        <div class="step-label">STEP 3</div>
-        <h3>仲間と歩き出す</h3>
-        <p>8月から伴走者と一緒に</p>
-      </div>
-    </div>
+    </article>
+  </div>
+
+  <div class="join-strip reveal reveal-d2">
+    <span>無料</span>
+    <span>匿名OK</span>
+    <span>スマホで完結</span>
+    <span>いつでも退出OK</span>
+  </div>
+
+  <div class="join-actions reveal reveal-d3">
+    <a href="https://line.me/ti/g2/moz8RF2psKGF01MlRWTChSrKF5D4i4KZFv91Ng?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener" class="join-btn">
+      <svg viewBox="0 0 24 24"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.271.173-.508.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+      LINEで参加する
+    </a>
   </div>
 </div>
-</div>
+</section>
 
 <!-- ===== INVITATION ===== -->
-<div class="sec sec-warm">
+<section class="sec sec-white">
 <div class="container">
-  <div class="text-center reveal">
-    <p class="sec-eyebrow ey-mint">Invitation</p>
-    <h2 class="sec-title serif">この手紙は、きみに届くべきものだ。</h2>
+  <div class="reveal" style="text-align:center;">
+    <div class="label" style="justify-content:center;"><span class="num">06</span>Invitation</div>
+    <h2 class="h-title serif">こんな気持ちで、<br><span class="it">参加してね。</span></h2>
+    <p class="h-lead" style="margin-left:auto;margin-right:auto;text-align:center;">参加する中高生と、協力してくれる先生・大人たちへ。<br>それぞれに向けたメッセージです。</p>
   </div>
-  <div class="invite-grid">
-    <div class="invite-card front reveal reveal-d1">
-      <div class="invite-photo"><img src="images/invite1.jpg" alt="" loading="lazy"></div>
-      <div class="invite-body-wrap">
-        <p class="invite-for">For Frontrunners ── 小・中・高校生、教員のあなたへ</p>
-        <h3 class="serif">最初の一歩は、<br>"入る"だけでいい。</h3>
-        <p class="invite-body">あのとき感じた「変わりたい」は、本物だ。嘘じゃない。幻でもない。<br><br>ただ、ひとりで走り続けるには、道が長すぎるだけ。<span class="accent">だから、一緒にやろう。</span>完璧な計画はいらない。「なんか気になる」──その直感だけで十分だ。<br><br><strong>4ヶ月後のきみは、今のきみが想像もしない場所に立っている。</strong></p>
+
+  <div class="letters">
+    <article class="letter reveal reveal-d1">
+      <div class="letter-photo"><img src="images/break1.jpg" alt="参加を考える中高生へのメッセージ"></div>
+      <span class="letter-role">参加する方へ</span>
+      <p class="letter-tag">For Students — 中学生・高校生のみなさんへ</p>
+      <h3 class="letter-title serif">最初は、<br><span class="it">「のぞくだけ」</span>でいい。</h3>
+      <div class="letter-body">
+        <p>あのとき感じた「なんか気になる」は、本物。まだ言葉になっていなくても大丈夫。</p>
+        <p>ただ、ひとりで続けるには、ちょっと長い道のりなだけ。<br><em>だから、一緒にやろう。</em></p>
+        <p>最初から発言しなくても、完璧な計画がなくても大丈夫。<br>「ちょっと見てみたい」くらいの軽さで入ってきてください。</p>
       </div>
-    </div>
-    <div class="invite-card bansou reveal reveal-d2">
-      <div class="invite-photo"><img src="images/invite2.jpg" alt="" loading="lazy"></div>
-      <div class="invite-body-wrap">
-        <p class="invite-for">For Bansou ── 伴走者となる大人たちへ</p>
-        <h3 class="serif">"見ているよ"──<br>その一言が、脳を変える。</h3>
-        <p class="invite-body"><strong>ただ、そこにいること。</strong><br><strong>「先週より、ここが変わったね」と気づくこと。</strong><br><strong>「大丈夫、続けていい」と伝えること。</strong><br><br>子どもたちの定点観測を支え、心理的安全性と承認を届ける。それは、あなた自身の成長でもある。<br><br><strong>双方向の成長循環──それが、脳の学校のエコシステムだ。</strong></p>
+      <p class="letter-signature">— Synapse Cafe</p>
+    </article>
+
+    <article class="letter reveal reveal-d2">
+      <div class="letter-photo"><img src="images/invite2.jpg" alt="伴走する大人へのメッセージ"></div>
+      <span class="letter-role support">協力してくれる方へ</span>
+      <p class="letter-tag">For Teachers & Companions — 先生・伴走する大人たちへ</p>
+      <h3 class="letter-title serif">「見てるよ」の<br><span class="it">ひとこと</span>が、継続を支える。</h3>
+      <div class="letter-body">
+        <p>先生や協力者の役割は、正解を急いで渡すことではありません。<br>「先週よりちょっと変わったね」と気づくこと。<br>「大丈夫、続けていいよ」と伝えること。</p>
+        <p>中高生の定点観測を支えることは、<em>あなた自身の学びにもなる。</em></p>
+        <p>双方向に育つ場所。<br>それが、シナプスカフェ。</p>
       </div>
-    </div>
+      <p class="letter-signature">— Synapse Cafe</p>
+    </article>
   </div>
 </div>
-</div>
+</section>
 
 <!-- ===== CTA ===== -->
-<div class="cta-sec">
-  <div class="reveal">
-    <h2 class="cta-title serif">扉は、もう<span class="blue">開いている。</span></h2>
-    <p class="cta-sub">「4ヶ月 脳の学校」の入口は、LINEオープンチャット。<br>登録は無料。今すぐ、きみの居場所に入れる。</p>
+<section class="cta-sec">
+  <div class="cta-inner reveal">
+    <span class="cta-rule"></span>
+    <p class="cta-eyebrow">Ready when you are</p>
+    <h2 class="cta-title">Start with <span class="ac">LINE.</span></h2>
+    <p class="cta-sub-ja serif">入口は、LINEオープンチャット。<br>無料・匿名OK。まずは読むだけでも参加です。</p>
     <a href="https://line.me/ti/g2/moz8RF2psKGF01MlRWTChSrKF5D4i4KZFv91Ng?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener" class="cta-btn">
       <svg viewBox="0 0 24 24"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.271.173-.508.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-      LINEで「脳の学校」に参加する
+      LINEで参加する
     </a>
-    <p class="cta-note">※ LINEオープンチャットに遷移します。匿名参加OK。いつでも退出できます。</p>
+    <p class="cta-note">Free · Anonymous · Mobile friendly</p>
   </div>
-</div>
+</section>
 
 <footer>
+  <div class="f-logo latin">Synapse Cafe</div>
+  <div class="f-logo-ja serif">シナプスカフェ</div>
   <div class="f-orgs">
-    <div class="f-org"><span class="name">DAncing Einstein</span><br>青砥瑞人</div>
-    <div class="f-org"><span class="name">株式会社E3 Habit</span><br>代表取締役 二川佳祐</div>
+    <div class="f-org">
+      <span class="name">DAncing Einstein</span>
+      青砥瑞人
+    </div>
+    <div class="f-org">
+      <span class="name">E3 Habit, Inc.</span>
+      二川佳祐
+    </div>
   </div>
-  <p class="f-info">期間：2026年8月〜12月（4ヶ月間）&ensp;|&ensp;LINEオープンチャットへの参加は無料</p>
-  <p class="f-copy">&copy; 2026 脳の学校</p>
+  <p class="f-info">Aug - Dec 2026 · 4 months · Free</p>
+  <p class="f-copy">© 2026 SYNAPSE CAFE</p>
 </footer>
 
 <script>
-// Robust reveal: works in all environments
 (function(){
   var els=document.querySelectorAll('.reveal');
   if(!('IntersectionObserver' in window)){
-    els.forEach(function(el){el.style.opacity='1';el.style.transform='none';});
+    els.forEach(function(el){el.classList.add('in');});
     return;
   }
-  // Reset to hidden for JS-driven animation
-  els.forEach(function(el){el.style.opacity='0';el.style.transform='translateY(36px)';el.style.transition='opacity 0.8s cubic-bezier(.25,.46,.45,.94),transform 0.8s cubic-bezier(.25,.46,.45,.94)';});
   var ob=new IntersectionObserver(function(entries){
     entries.forEach(function(e){
-      if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';ob.unobserve(e.target);}
+      if(e.isIntersecting){e.target.classList.add('in');ob.unobserve(e.target);}
     });
-  },{threshold:0.02,rootMargin:'0px 0px 0px 0px'});
+  },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
   els.forEach(function(el){ob.observe(el);});
-  // Safety fallback
-  setTimeout(function(){els.forEach(function(el){el.style.opacity='1';el.style.transform='none';});},1500);
+  setTimeout(function(){els.forEach(function(el){el.classList.add('in');});},2000);
 })();
 </script>
 </body>
