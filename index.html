@@ -7,33 +7,34 @@
   <meta name="description" content="脳科学者・青砥瑞人と二川佳祐がつくる、中高生のための4ヶ月の思考コミュニティ。LINEオープンチャットから無料・匿名で参加できます。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Noto+Sans+JP:wght@400;500;700;800&family=Noto+Serif+JP:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1:wght@300;400;500;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
 
+    /* BeYond Labo マスターデザイン準拠（Downloads/10_プロジェクト/beyondlabo-design/） */
     :root{
-      --paper:#fbfdf8;
-      --paper-deep:#eef8f4;
+      --paper:#f8f8f3;
+      --paper-deep:#efeee6;
       --white:#ffffff;
-      --ink:#17212b;
-      --ink-2:#41505f;
-      --ink-3:#6f7b87;
-      --line:rgba(23,33,43,0.12);
-      --line-strong:rgba(23,33,43,0.2);
-      --sky:#1b8cff;
-      --sky-soft:#dff0ff;
-      --coral:#ff6542;
-      --coral-soft:#ffe7de;
-      --lime:#c7f04a;
-      --lime-soft:#f1ffd2;
-      --violet:#7a5cff;
-      --violet-soft:#ece8ff;
+      --ink:#1e1e1e;
+      --ink-2:#55554c;
+      --ink-3:#8a8a7e;
+      --line:rgba(30,30,30,0.12);
+      --line-strong:rgba(30,30,30,0.2);
+      --sky:#1d2088;
+      --sky-soft:#e4e4f2;
+      --coral:#eb6877;
+      --coral-soft:#f9dfe2;
+      --lime:#e4e4c8;
+      --lime-soft:#f4f4e4;
+      --violet:#1d2088;
+      --violet-soft:#e4e4f2;
       --green:#06c755;
-      --shadow:0 18px 45px rgba(30,50,70,0.12);
+      --shadow:0 18px 45px rgba(30,30,30,0.10);
     }
     *{margin:0;padding:0;box-sizing:border-box;}
     html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
     body{
-      font-family:'Noto Sans JP','M PLUS Rounded 1c',sans-serif;
+      font-family:"Yu Gothic","游ゴシック",YuGothic,"游ゴシック体","M PLUS 1",sans-serif;
       background:
         linear-gradient(rgba(23,33,43,0.035) 1px,transparent 1px),
         linear-gradient(90deg,rgba(23,33,43,0.035) 1px,transparent 1px),
@@ -44,8 +45,8 @@
       overflow-x:hidden;
       font-weight:500;
     }
-    .serif{font-family:'Noto Serif JP',serif;}
-    .latin,.ui{font-family:'Inter',sans-serif;}
+    .serif{font-family:"M PLUS 1",sans-serif;font-weight:300;}
+    .latin,.ui{font-family:'Poppins',sans-serif;}
     img{display:block;width:100%;height:100%;object-fit:cover;}
     a{color:inherit;text-decoration:none;}
 
@@ -102,12 +103,12 @@
     }
     .hero-eyebrow::before{content:"";width:34px;height:3px;background:var(--lime);box-shadow:10px 8px 0 var(--coral);}
     .hero-title{
-      font-family:'Inter',sans-serif;font-weight:800;
+      font-family:'Poppins',sans-serif;font-weight:800;
       font-size:clamp(3.3rem,8.4vw,7.2rem);
       line-height:.93;letter-spacing:0;margin-bottom:1rem;
     }
     .hero-title .a,.hero-title .b{display:block;}
-    .hero-title .b{color:var(--lime);text-shadow:4px 4px 0 rgba(255,101,66,.68);padding-left:.65em;}
+    .hero-title .b{color:var(--lime);text-shadow:4px 4px 0 rgba(235,104,119,.68);padding-left:.65em;}
     .hero-ja{font-weight:800;font-size:clamp(1.02rem,1.7vw,1.22rem);letter-spacing:.08em;color:var(--ink);}
     .hero-right{display:flex;flex-direction:column;align-items:flex-start;gap:1.1rem;}
     .hero-tagline{font-size:clamp(1.25rem,2.5vw,2rem);font-weight:800;line-height:1.55;letter-spacing:0;max-width:420px;}
@@ -136,7 +137,7 @@
     .label::before{content:"";width:22px;height:8px;background:var(--coral);box-shadow:10px 7px 0 var(--sky);}
     .label .num{display:inline-grid;place-items:center;width:28px;height:28px;border:1px solid var(--ink);background:var(--lime);color:var(--ink);font-size:.72rem;letter-spacing:0;border-radius:6px;}
     .h-title{font-size:clamp(1.8rem,4vw,3rem);line-height:1.45;letter-spacing:0;font-weight:800;color:var(--ink);margin-bottom:1.2rem;}
-    .h-title .it{font-family:'Noto Serif JP',serif;font-weight:600;font-style:normal;color:var(--coral);background:linear-gradient(transparent 62%,var(--lime-soft) 62%);padding:0 .04em;white-space:nowrap;}
+    .h-title .it{font-family:"M PLUS 1",sans-serif;font-weight:600;font-style:normal;color:var(--coral);background:linear-gradient(transparent 62%,var(--lime-soft) 62%);padding:0 .04em;white-space:nowrap;}
     .h-title .em{font-weight:800;}
     .h-lead{font-size:1.08rem;color:var(--ink-2);line-height:2.05;letter-spacing:0;max-width:660px;}
 
@@ -147,7 +148,7 @@
     .empathy-photo-caption{display:flex;justify-content:space-between;gap:1rem;margin-top:1rem;color:var(--ink-3);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
     .empathy-body{padding-top:.4rem;}
     .empathy-poem{font-size:1.16rem;line-height:2.25;color:var(--ink);margin-bottom:2rem;font-weight:700;}
-    .empathy-poem .drop{float:left;font-family:'Inter',sans-serif;font-size:3.2rem;line-height:.9;padding:.18em .18em 0 0;color:var(--sky);font-weight:800;}
+    .empathy-poem .drop{float:left;font-family:'Poppins',sans-serif;font-size:3.2rem;line-height:.9;padding:.18em .18em 0 0;color:var(--sky);font-weight:800;}
     .voice-list{display:grid;gap:.8rem;}
     .voice-item{display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:start;padding:1.1rem 1.2rem;background:#fff;border:1px solid var(--line);border-left:7px solid var(--coral);border-radius:8px;box-shadow:0 8px 24px rgba(30,50,70,.06);color:var(--ink-2);font-size:1.04rem;line-height:1.8;}
     .voice-item .v-num{font-weight:800;color:var(--sky);font-size:.82rem;padding-top:.18rem;}
@@ -161,7 +162,7 @@
     .photo-band::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(23,33,43,.75),rgba(23,33,43,.18));}
     .photo-band-text{position:absolute;inset:0;z-index:2;display:flex;align-items:center;padding:0 clamp(1.2rem,4vw,2.5rem);}
     .photo-band-inner{max-width:1180px;margin:0 auto;width:100%;color:#fff;}
-    .photo-band-en{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(2rem,5vw,4.2rem);line-height:1.02;letter-spacing:0;margin-bottom:.9rem;max-width:700px;}
+    .photo-band-en{font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(2rem,5vw,4.2rem);line-height:1.02;letter-spacing:0;margin-bottom:.9rem;max-width:700px;}
     .photo-band-en em{font-style:normal;color:var(--lime);}
     .photo-band-ja{font-weight:700;font-size:clamp(.95rem,1.8vw,1.12rem);line-height:1.9;max-width:560px;color:rgba(255,255,255,.9);}
 
@@ -171,7 +172,7 @@
     .concept-mark{display:grid;grid-template-columns:1fr auto 1fr;gap:1.2rem;align-items:center;margin:3.8rem auto 3rem;max-width:760px;}
     .concept-side{padding:1.5rem;background:#fff;border:2px solid var(--ink);border-radius:8px;box-shadow:7px 7px 0 var(--coral-soft);text-align:center;}
     .concept-side.to{box-shadow:7px 7px 0 var(--sky-soft);}
-    .concept-side .word-en{font-family:'Inter',sans-serif;font-size:clamp(1.7rem,4vw,2.6rem);font-weight:800;line-height:1;color:var(--ink);}
+    .concept-side .word-en{font-family:'Poppins',sans-serif;font-size:clamp(1.7rem,4vw,2.6rem);font-weight:800;line-height:1;color:var(--ink);}
     .concept-side .word-ja{margin-top:.55rem;font-size:.86rem;font-weight:800;color:var(--ink-2);letter-spacing:.12em;}
     .concept-line{width:76px;height:3px;background:var(--ink);position:relative;}
     .concept-line::after{content:"";position:absolute;right:-2px;top:-6px;width:14px;height:14px;border-top:3px solid var(--ink);border-right:3px solid var(--ink);transform:rotate(45deg);}
@@ -182,7 +183,7 @@
     /* ===== MENU ===== */
     .menu-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2rem;align-items:end;margin-bottom:3rem;}
     .menu-head-right{text-align:right;}
-    .menu-head-num{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(2.8rem,8vw,6.2rem);line-height:.9;color:var(--sky);opacity:.18;letter-spacing:0;}
+    .menu-head-num{font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(2.8rem,8vw,6.2rem);line-height:.9;color:var(--sky);opacity:.18;letter-spacing:0;}
     .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;}
     .menu-card{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 12px 32px rgba(30,50,70,.08);transition:transform .28s,box-shadow .28s;}
     .menu-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);}
@@ -192,7 +193,7 @@
     .menu-photo-num{position:absolute;left:1rem;top:1rem;display:grid;place-items:center;width:42px;height:42px;background:var(--lime);border:2px solid var(--ink);color:var(--ink);font-size:.85rem;font-weight:800;border-radius:8px;box-shadow:4px 4px 0 rgba(23,33,43,.72);}
     .menu-tag{padding:1.2rem 1.25rem 0;color:var(--sky);font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;}
     .menu-title{padding:0 1.25rem;margin:.4rem 0 .65rem;font-size:1.32rem;line-height:1.55;font-weight:800;color:var(--ink);}
-    .menu-title .it{font-family:'Noto Serif JP',serif;font-style:normal;color:var(--coral);font-weight:600;}
+    .menu-title .it{font-family:"M PLUS 1",sans-serif;font-style:normal;color:var(--coral);font-weight:600;}
     .menu-body{padding:0 1.25rem 1rem;color:var(--ink-2);font-size:1rem;line-height:1.9;}
     .menu-meta{margin:0 1.25rem 1.25rem;padding:.8rem .9rem;background:var(--paper-deep);border-radius:8px;color:var(--ink-3);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
     .menu-meta strong{color:var(--ink);}
@@ -257,7 +258,7 @@
     .letter-role.support{background:var(--sky-soft);}
     .letter-tag{padding:.75rem 1.4rem 0;color:var(--sky);font-size:.82rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
     .letter-title{padding:0 1.4rem;margin:.5rem 0 1rem;font-size:clamp(1.35rem,2.5vw,1.82rem);line-height:1.5;font-weight:800;color:var(--ink);}
-    .letter-title .it{font-family:'Noto Serif JP',serif;font-style:normal;color:var(--coral);font-weight:600;}
+    .letter-title .it{font-family:"M PLUS 1",sans-serif;font-style:normal;color:var(--coral);font-weight:600;}
     .letter-body{padding:0 1.4rem 1.4rem;color:var(--ink-2);font-size:1rem;line-height:2;}
     .letter-body p+p{margin-top:1rem;}
     .letter-body em{font-style:normal;font-weight:800;color:var(--ink);background:linear-gradient(transparent 62%,var(--lime-soft) 62%);}
@@ -269,7 +270,7 @@
     .cta-inner{position:relative;z-index:1;max-width:760px;margin:0 auto;}
     .cta-rule{display:block;width:74px;height:8px;background:var(--lime);box-shadow:18px 12px 0 var(--coral);margin:0 auto 2rem;}
     .cta-eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--lime);font-weight:800;margin-bottom:1rem;}
-    .cta-title{font-family:'Inter',sans-serif;font-size:clamp(2.4rem,6vw,4.8rem);line-height:1;font-weight:800;letter-spacing:0;margin-bottom:1.1rem;}
+    .cta-title{font-family:'Poppins',sans-serif;font-size:clamp(2.4rem,6vw,4.8rem);line-height:1;font-weight:800;letter-spacing:0;margin-bottom:1.1rem;}
     .cta-title .ac{color:var(--lime);}
     .cta-sub-ja{font-size:1rem;line-height:2;color:rgba(255,255,255,.84);font-weight:700;margin-bottom:2rem;}
     .cta-note{margin-top:1.4rem;color:rgba(255,255,255,.64);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
