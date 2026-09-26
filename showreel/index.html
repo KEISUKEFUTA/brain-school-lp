@@ -153,7 +153,16 @@ function sceneA(ctx, t) {
   text(ctx, '毎日を、積み重ねる人。', W / 2, H / 2 - 320, { size: 30, w: 700, fam: JP, ls: 12, align: 'center', alpha: P(t, .25, .5) * (1 - collapse) * .8 });
 }
 
-// ---------- SCENE B — name (2.0–4.0) ----------
+// ---------- SCENE B — name + portrait (2.0–4.0) ----------
+const PHOTO = new Image(); PHOTO.src = 'photos/profile.jpg';
+// draws the photo "cover"-fitted into a box, focused on (fx, fy) in source pixels, with extra zoom z
+function photoCover(ctx, box, fx, fy, z) {
+  const iw = PHOTO.naturalWidth, ih = PHOTO.naturalHeight; if (!iw) return;
+  const s = Math.max(box.w / iw, box.h / ih) * z;
+  let sx = box.x + box.w / 2 - fx * s, sy = box.y + box.h / 2 - fy * s;
+  sx = Math.min(box.x, Math.max(box.x + box.w - iw * s, sx)); sy = Math.min(box.y, Math.max(box.y + box.h - ih * s, sy));
+  ctx.drawImage(PHOTO, sx, sy, iw * s, ih * s);
+}
 function sceneB(ctx, t) {
   bg(ctx, C.indigo);
   const lt = t - 2;
@@ -163,21 +172,39 @@ function sceneB(ctx, t) {
   ctx.strokeText('KEISUKE KEISUKE KEISUKE', -900 + lt * 160, H / 2 + 360); ctx.restore();
   const exit = E.inExpo(P(t, 3.72, 4.0));
   ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(1 + exit * .25, 1 + exit * .25); ctx.translate(-W / 2, -H / 2);
-  // role line typed
-  const roles = 'EDUCATOR  ×  COMMUNITY BUILDER  ×  FOUNDER';
-  const n = Math.floor(roles.length * P(t, 2.12, 2.6));
-  text(ctx, roles.slice(0, n) + (n < roles.length && n > 0 ? '▍' : ''), W / 2, H / 2 - 215, { size: 28, w: 600, ls: 9, align: 'center', color: C.coral });
-  // name
-  riseChars(ctx, '二川佳祐', W / 2, H / 2 + 55, t, 2.2, { size: 250, w: 900, fam: JP, ls: 26, align: 'center', stagger: .07, dur: .5 });
-  const nw = tw(ctx, '二川佳祐', 250, 900, JP, 26);
-  const ul = E.outExpo(P(t, 2.5, 2.95));
-  ctx.fillStyle = C.coral; ctx.fillRect(W / 2 - nw / 2, H / 2 + 95, nw * ul, 10);
-  const ls = lerp(70, 22, E.outExpo(P(t, 2.5, 3.3)));
-  text(ctx, 'KEISUKE FUTAKAWA', W / 2, H / 2 + 175, { size: 44, w: 600, ls, align: 'center', alpha: P(t, 2.5, 2.8) });
-  // tagline block reveal
+  // portrait panel: coral block wipes up, then the photo is uncovered bottom→top
+  const box = { x: 1150, y: 150, w: 600, h: 780 };
+  const fo = E.outExpo(P(t, 2.3, 2.8));
+  ctx.strokeStyle = C.coral; ctx.lineWidth = 3; ctx.globalAlpha = fo;
+  ctx.strokeRect(box.x + 28 + (1 - fo) * 60, box.y + 28 + (1 - fo) * 60, box.w, box.h); ctx.globalAlpha = 1;
+  const q1 = E.inOutExpo(P(t, 2.08, 2.34)), q2 = E.inOutExpo(P(t, 2.34, 2.66));
+  if (q2 > 0) {
+    ctx.save(); ctx.beginPath(); ctx.rect(box.x, box.y + box.h * (1 - q2), box.w, box.h * q2); ctx.clip();
+    photoCover(ctx, box, 410, 430, lerp(1.22, 1.04, E.outCubic(P(t, 2.34, 3.9))));
+    const g = ctx.createLinearGradient(0, box.y + box.h * .6, 0, box.y + box.h);
+    g.addColorStop(0, 'rgba(29,32,136,0)'); g.addColorStop(1, 'rgba(29,32,136,.55)');
+    ctx.fillStyle = g; ctx.fillRect(box.x, box.y, box.w, box.h); ctx.restore();
+  }
+  const a = box.y + box.h * (1 - q1), b = box.y + box.h * (1 - q2);
+  if (b - a > .5) { ctx.fillStyle = C.coral; ctx.fillRect(box.x, a, box.w, b - a); }
+  // book tag pinned to the panel
+  const bk = '著書『教師の習慣化』', bw = tw(ctx, bk, 30, 800, JP, 2);
+  blockReveal(ctx, t, 3.05, .4, { x: box.x - 40, y: box.y + box.h - 92, w: bw + 44, h: 58 }, C.coral, () => {
+    ctx.fillStyle = C.paper; ctx.fillRect(box.x - 40, box.y + box.h - 92, bw + 44, 58);
+    text(ctx, bk, box.x - 18, box.y + box.h - 52, { size: 30, w: 800, fam: JP, ls: 2, color: C.ink }); });
+  // left column: roles, name, romaji, tagline
+  const x = 170;
+  const roles = 'EDUCATOR  ×  FOUNDER  ×  AUTHOR';
+  const n = Math.floor(roles.length * P(t, 2.12, 2.55));
+  text(ctx, roles.slice(0, n) + (n < roles.length && n > 0 ? '▍' : ''), x, H / 2 - 205, { size: 28, w: 600, ls: 9, color: C.coral });
+  riseChars(ctx, '二川佳祐', x, H / 2 + 45, t, 2.2, { size: 215, w: 900, fam: JP, ls: 18, stagger: .07, dur: .5 });
+  const nw = tw(ctx, '二川佳祐', 215, 900, JP, 18);
+  ctx.fillStyle = C.coral; ctx.fillRect(x, H / 2 + 85, nw * E.outExpo(P(t, 2.5, 2.95)), 10);
+  const ls = lerp(60, 20, E.outExpo(P(t, 2.5, 3.3)));
+  text(ctx, 'KEISUKE FUTAKAWA', x, H / 2 + 162, { size: 42, w: 600, ls, alpha: P(t, 2.5, 2.8) });
   const tag = '学びを「続ける」を、応援する。', tgw = tw(ctx, tag, 48, 800, JP, 4);
-  blockReveal(ctx, t, 2.95, .5, { x: W / 2 - tgw / 2 - 20, y: H / 2 + 222, w: tgw + 40, h: 76 }, C.coral, () =>
-    text(ctx, tag, W / 2, H / 2 + 276, { size: 48, w: 800, fam: JP, ls: 4, align: 'center', color: C.lime }));
+  blockReveal(ctx, t, 2.95, .5, { x: x - 14, y: H / 2 + 210, w: tgw + 28, h: 76 }, C.coral, () =>
+    text(ctx, tag, x, H / 2 + 264, { size: 48, w: 800, fam: JP, ls: 4, color: C.lime }));
   ctx.restore();
 }
 
@@ -368,18 +395,27 @@ function sceneF(ctx, t) {
     ctx.restore(); ctx.globalAlpha = 1;
   }
   if (t < 13.9) return;
-  const ly = H / 2 + 40;
-  const dot = E.outBack(P(t, 13.9, 14.02)), line = E.outExpo(P(t, 14.0, 14.4));
-  circle(ctx, W / 2, ly, 16 * dot * (1 - line), C.coral);
+  const ly = H / 2 + 150, pcx = W / 2, pcy = H / 2 - 170;
+  // callback: the coral "day" dot pops, then opens into the portrait
+  const dot = E.outBack(P(t, 13.9, 14.0)), open = E.outExpo(P(t, 13.98, 14.4)), R = 150;
+  circle(ctx, pcx, pcy, lerp(18 * dot, R + 10, open), C.coral);
+  if (open > 0) {
+    ctx.save(); ctx.beginPath(); ctx.arc(pcx, pcy, R * open, 0, Math.PI * 2); ctx.clip();
+    photoCover(ctx, { x: pcx - R, y: pcy - R, w: R * 2, h: R * 2 }, 410, 275, lerp(2.9, 2.35, E.outCubic(P(t, 13.98, 15))));
+    ctx.restore();
+    ctx.strokeStyle = C.coral; ctx.lineWidth = 3; ctx.globalAlpha = 1 - P(t, 14.0, 14.6);
+    ctx.beginPath(); ctx.arc(pcx, pcy, R + 10 + 120 * E.outExpo(P(t, 14.0, 14.6)), 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+  }
+  const line = E.outExpo(P(t, 14.05, 14.45));
   ctx.fillStyle = C.coral; ctx.fillRect(W / 2 - 420 * line, ly - 4, 840 * line, 8);
-  const np = E.outExpo(P(t, 14.02, 14.45));
-  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ly - 12); ctx.clip();
-  text(ctx, '二川佳祐', W / 2, ly - 42 + (1 - np) * 190, { size: 160, w: 900, fam: JP, ls: 30, align: 'center' });
+  const np = E.outExpo(P(t, 14.08, 14.5));
+  ctx.save(); ctx.beginPath(); ctx.rect(0, ly - 200, W, 188); ctx.clip();
+  text(ctx, '二川佳祐', W / 2, ly - 36 + (1 - np) * 170, { size: 128, w: 900, fam: JP, ls: 26, align: 'center' });
   ctx.restore();
-  const sp = E.outExpo(P(t, 14.12, 14.6));
-  text(ctx, 'KEISUKE FUTAKAWA', W / 2, ly + 78, { size: 38, w: 600, ls: lerp(44, 18, sp), align: 'center', alpha: sp });
-  text(ctx, 'Founder, E3 Habit, Inc.   ·   BeYond Labo', W / 2, ly + 138, { size: 28, w: 500, ls: 3, align: 'center', alpha: E.outCubic(P(t, 14.22, 14.55)) * .75 });
-  text(ctx, 'Voicy 毎朝配信   ·   Instagram @futakawa.sensei', W / 2, ly + 190, { size: 24, w: 500, fam: MIX, ls: 3, align: 'center', color: C.coral, alpha: E.outCubic(P(t, 14.32, 14.65)) });
+  const sp = E.outExpo(P(t, 14.15, 14.6));
+  text(ctx, 'KEISUKE FUTAKAWA', W / 2, ly + 66, { size: 34, w: 600, ls: lerp(40, 16, sp), align: 'center', alpha: sp });
+  text(ctx, 'Founder, E3 Habit, Inc.  ·  BeYond Labo  ·  著書『教師の習慣化』', W / 2, ly + 120, { size: 26, w: 500, fam: MIX, ls: 2, align: 'center', alpha: E.outCubic(P(t, 14.22, 14.55)) * .78 });
+  text(ctx, 'Voicy 毎朝配信   ·   Instagram @futakawa.sensei', W / 2, ly + 166, { size: 23, w: 500, fam: MIX, ls: 3, align: 'center', color: C.coral, alpha: E.outCubic(P(t, 14.32, 14.65)) });
 }
 
 // ---------- master timeline ----------
@@ -466,10 +502,11 @@ function renderFrame(t, subs = 5) {
 }
 
 // ---------- boot ----------
-const JPTEXT = '毎日を積み重ねる人。二川佳祐学びを「続ける」を、応援する。東京都の公立小学校で教員を17年。2023年9月から毎朝Voicyで発信。早起きを8年以上つづけている。国内外300人超の習慣化コミュニティ。東京学芸大学公立小学校教員BeYond Labo代表教育と社会の壁をなくす教壇を卒業株式会社E3 Habit創業習慣コミュニティ続ける人をずっと応援する。毎朝配信';
+const JPTEXT = '毎日を積み重ねる人。二川佳祐学びを「続ける」を、応援する。東京都の公立小学校で教員を17年。2023年9月から毎朝Voicyで発信。早起きを8年以上つづけている。国内外300人超の習慣化コミュニティ。東京学芸大学公立小学校教員BeYond Labo代表教育と社会の壁をなくす教壇を卒業株式会社E3 Habit創業習慣コミュニティ続ける人をずっと応援する。毎朝配信著書『教師の習慣化』';
 window.ready = (async () => {
   await Promise.all(['500', '700', '800', '900'].map(w => document.fonts.load(`${w} 40px "M PLUS 1"`, JPTEXT)).concat(['500', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px "Poppins"`, 'ABCxyz0123'))));
   await document.fonts.ready;
+  await PHOTO.decode();
   return true;
 })();
 window.renderFrame = renderFrame;

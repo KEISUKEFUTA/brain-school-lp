@@ -4,6 +4,7 @@
 - `index.html` — 動画のもとになるアニメーション本体。ブラウザで開いて ▶ を押すと音つきでリアルタイム再生
 - `soundtrack.py` — BGM・効果音をコードで合成（120BPM。場面の切り替わりが全部ビートに合う）
 - `render.cjs` — Playwright で1フレームずつ書き出し、ffmpeg で動画にまとめる
+- `photos/profile.jpg` — 本人写真（名前シーンとラストの名刺カードで使用）
 - `fetch_fonts.py` — 使用フォント（M PLUS 1 / Poppins）をダウンロードして `fonts/` に保存
 
 ## 再生成
