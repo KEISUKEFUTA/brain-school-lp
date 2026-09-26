@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Futakawa Showreel</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  :root { --bg:#0b0b0e; --fg:#f8f8f3; --coral:#eb6877; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg); overflow:hidden; }
+  body { display:flex; align-items:center; justify-content:center; font-family:"Poppins","M PLUS 1",sans-serif; }
+  canvas { width:min(100vw, calc(100vh * 16 / 9)); height:auto; aspect-ratio:16/9; display:block; }
+  #play { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;
+          background:rgba(11,11,14,.55); cursor:pointer; letter-spacing:.3em; font-size:14px; font-weight:600; }
+  #play span.btn { width:84px; height:84px; border-radius:50%; background:var(--coral); display:grid; place-items:center; }
+  #play span.btn::after { content:""; border-left:24px solid #fff; border-top:15px solid transparent; border-bottom:15px solid transparent; margin-left:6px; }
+  body.render #play { display:none; }
+</style>
+</head>
+<body>
+<canvas id="out" width="1920" height="1080"></canvas>
+<div id="play"><span class="btn"></span><span>PLAY WITH SOUND</span></div>
+<audio id="music" src="soundtrack.wav" preload="auto"></audio>
+<script>
+/* =========================================================
+   KEISUKE FUTAKAWA — SHOWREEL 2026
+   15s / 30fps / 120BPM (1 beat = 0.5s). Fully deterministic:
+   renderFrame(t) always produces the same image for the same t.
+   ========================================================= */
+const W = 1920, H = 1080, FPS = 30, DUR = 15;
+const C = { ink:'#121216', ink2:'#23232c', paper:'#f8f8f3', indigo:'#1d2088', coral:'#eb6877', lime:'#d6d69a' };
+const JP = '"M PLUS 1"', EN = '"Poppins"', MIX = '"Poppins","M PLUS 1"';
+
+// ---------- math ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  outExpo: x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x),
+  inExpo: x => x <= 0 ? 0 : Math.pow(2, 10 * x - 10),
+  inOutExpo: x => x <= 0 ? 0 : x >= 1 ? 1 : x < .5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2,
+  outCubic: x => 1 - Math.pow(1 - x, 3),
+  inCubic: x => x * x * x,
+  inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  inOutQuart: x => x < .5 ? 8 * x ** 4 : 1 - Math.pow(-2 * x + 2, 4) / 2,
+  outBack: x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+};
+function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- drawing helpers ----------
+function font(ctx, size, w = 800, fam = EN, ls = 0) { ctx.font = `${w} ${size}px ${fam}`; ctx.letterSpacing = ls + 'px'; }
+function text(ctx, s, x, y, o = {}) {
+  font(ctx, o.size || 40, o.w || 800, o.fam || EN, o.ls || 0);
+  ctx.fillStyle = o.color || C.paper; ctx.textAlign = o.align || 'left'; ctx.textBaseline = o.base || 'alphabetic';
+  ctx.globalAlpha = o.alpha == null ? 1 : o.alpha;
+  ctx.fillText(s, x, y); ctx.globalAlpha = 1;
+}
+function tw(ctx, s, size, w = 800, fam = EN, ls = 0) { font(ctx, size, w, fam, ls); return ctx.measureText(s).width - ls; }
+function bg(ctx, color) { ctx.fillStyle = color; ctx.fillRect(-200, -200, W + 400, H + 400); }
+function circle(ctx, x, y, r, color) { if (r <= 0) return; ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+// Colored bar sweeps in, then retracts revealing what drawFn paints inside the box.
+function blockReveal(ctx, t, t0, dur, box, color, drawFn) {
+  if (t < t0) return;
+  const p1 = E.inOutExpo(P(t, t0, t0 + dur * .5)), p2 = E.inOutExpo(P(t, t0 + dur * .5, t0 + dur));
+  if (p2 > 0) { ctx.save(); ctx.beginPath(); ctx.rect(box.x, box.y, box.w * p2, box.h); ctx.clip(); drawFn(); ctx.restore(); }
+  const a = box.x + box.w * p2, b = box.x + box.w * p1;
+  if (b - a > .5) { ctx.fillStyle = color; ctx.fillRect(a, box.y, b - a, box.h); }
+}
+// Characters rise out of a mask, staggered.
+function riseChars(ctx, s, x, y, t, t0, o) {
+  const size = o.size, ls = o.ls || 0, stag = o.stagger || .05, d = o.dur || .45;
+  font(ctx, size, o.w || 800, o.fam || JP, 0);
+  let cx = x;
+  if (o.align === 'center') { let total = 0; for (const ch of s) total += ctx.measureText(ch).width + ls; cx = x - (total - ls) / 2; }
+  ctx.save(); ctx.beginPath(); ctx.rect(-500, y - size * 1.1, W + 1000, size * 1.35); ctx.clip();
+  ctx.fillStyle = o.color || C.paper; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  let i = 0;
+  for (const ch of s) {
+    const w = ctx.measureText(ch).width;
+    const p = (o.ease || E.outExpo)(P(t, t0 + i * stag, t0 + i * stag + d));
+    if (p > 0) { ctx.save(); ctx.translate(cx + w / 2, y + (1 - p) * size * 1.2); ctx.rotate((1 - p) * .25); ctx.fillText(ch, -w / 2, 0); ctx.restore(); }
+    cx += w + ls; i++;
+  }
+  ctx.restore();
+}
+
+// ---------- transitions (drawn on top of the outgoing scene) ----------
+function slab(ctx, p, color, lead = C.coral) {         // diagonal wipe, p: 0→1 covers screen
+  const sk = 420;
+  const draw = (q, col) => { const x = lerp(-sk - 40, W + 40, q); ctx.fillStyle = col; ctx.beginPath();
+    ctx.moveTo(-sk - 60, -10); ctx.lineTo(x + sk, -10); ctx.lineTo(x, H + 10); ctx.lineTo(-sk - 60, H + 10); ctx.fill(); };
+  draw(E.inOutCubic(clamp(p * 1.15)), lead); draw(E.inOutCubic(p), color);
+}
+function iris(ctx, p, cx, cy, color, ring = C.coral) {
+  const R = Math.hypot(W, H) * 1.05, e = E.inOutCubic(p);
+  circle(ctx, cx, cy, R * clamp(e * 1.18), ring); circle(ctx, cx, cy, R * e, color);
+}
+function shutter(ctx, p, color, n = 8, vertical = true, edge = C.coral) {
+  for (let i = 0; i < n; i++) {
+    const q = E.inOutCubic(P(p, i * .06, i * .06 + 1 - (n - 1) * .06));
+    if (vertical) { const w = W / n + 1, h = H * q; ctx.fillStyle = color; ctx.fillRect(i * W / n, 0, w, h); ctx.fillStyle = edge; ctx.fillRect(i * W / n, h - 8, w, q > 0 && q < 1 ? 8 : 0); }
+    else { const h = H / n + 1, w = W * q; ctx.fillStyle = color; ctx.fillRect(0, i * H / n, w, h); ctx.fillStyle = edge; ctx.fillRect(w - 8, i * H / n, q > 0 && q < 1 ? 8 : 0, h); }
+  }
+}
+
+// ---------- precomputed data ----------
+const R0 = rng(7);
+const GRID = []; { const cols = 29, rows = 13, sp = 50;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const x = W / 2 + (c - 14) * sp, y = H / 2 + (r - 6) * sp;
+    GRID.push({ x, y, d: Math.hypot(c - 14, (r - 6) * 1.25), i: r * cols + c, j: R0() }); }
+  GRID.sort((a, b) => a.d - b.d); GRID.length = 365; }
+const MAXD = GRID[GRID.length - 1].d;
+const BARS17 = Array.from({ length: 17 }, (_, i) => 120 + 300 * (0.35 + 0.65 * ((i + 1) / 17)) * (0.75 + R0() * .25));
+const SWARM = Array.from({ length: 300 }, (_, i) => ({ a: i * 2.39996, r: 60 + Math.sqrt(i) * 34 + R0() * 40, gx: 1170 + (i % 20) * 30, gy: H / 2 - 225 + Math.floor(i / 20) * 30, d: R0() * .18, c: i % 9 === 4 }));
+const BRICKS = []; { const rows = 15, bh = 72, bw = 160, x0 = W / 2 - 240, x1 = W / 2 + 240, R = rng(21);
+  for (let r = 0; r < rows; r++) { const off = (r % 2) * bw / 2; let col = 0;
+    for (let x = x0 - off; x < x1; x += bw, col++) {
+      const a = Math.max(x, x0), b = Math.min(x + bw, x1); if (b - a < 10) continue;
+      const cx = (a + b) / 2, cy = r * bh + bh / 2, ang = Math.atan2(cy - H / 2, cx - W / 2) + (R() - .5) * .9, sp = 900 + R() * 1700;
+      BRICKS.push({ x: a, y: r * bh, w: b - a, h: bh, row: r, col, vx: Math.cos(ang) * sp + (cx - W / 2) * 3, vy: Math.sin(ang) * sp - 600 - R() * 500, vr: (R() - .5) * 14, shade: R() }); } } }
+const STARS = Array.from({ length: 140 }, () => ({ x: R0() * 7000 - 1500, y: (R0() - .5) * 1200, z: .2 + R0() * .6, s: R0() }));
+
+// ---------- SCENE A — prologue (0.0–2.0) ----------
+function sceneA(ctx, t) {
+  bg(ctx, C.ink);
+  const collapse = E.inExpo(P(t, 1.72, 2.0));
+  for (const g of GRID) {
+    if (g.d === 0) continue;
+    const ta = .28 + g.d / MAXD * 1.05, p = P(t, ta, ta + .28);
+    if (p <= 0) continue;
+    const x = lerp(g.x, W / 2, collapse), y = lerp(g.y, H / 2, collapse);
+    const flash = 1 - P(t, ta, ta + .45);
+    ctx.globalAlpha = lerp(.22, 1, flash) * (1 - collapse * .3);
+    circle(ctx, x, y, 7 * E.outBack(p) * (1 - collapse * .5), flash > .5 ? C.coral : C.paper);
+  }
+  ctx.globalAlpha = 1;
+  const beat = Math.exp(-((t % .5)) * 9);
+  circle(ctx, W / 2, H / 2, (14 + 8 * beat) * E.outBack(P(t, 0, .3)) * (1 + collapse * 1.5), C.coral);
+  // kinetic words on the beat
+  const words = [['EVERY', .5], ['SINGLE', 1.0], ['DAY.', 1.5]];
+  for (let k = 0; k < words.length; k++) {
+    const [w, t0] = words[k], t1 = k < 2 ? words[k + 1][1] : 1.86;
+    if (t < t0 || t >= t1) continue;
+    const p = E.outExpo(P(t, t0, t0 + .2));
+    ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(lerp(1.6, 1, p), lerp(1.6, 1, p));
+    ctx.globalAlpha = p;
+    text(ctx, w, 0, 0, { size: 270, w: 800, ls: 6, align: 'center', base: 'middle', color: k === 2 ? C.coral : C.paper });
+    ctx.restore();
+  }
+  const day = Math.max(1, Math.floor(365 * E.outCubic(P(t, .3, 1.55))));
+  text(ctx, `DAY ${String(day).padStart(3, '0')} / 365`, W / 2, H / 2 + 330, { size: 26, w: 600, ls: 10, align: 'center', color: C.coral, alpha: P(t, .1, .3) * (1 - collapse) });
+  text(ctx, '毎日を、積み重ねる人。', W / 2, H / 2 - 320, { size: 30, w: 700, fam: JP, ls: 12, align: 'center', alpha: P(t, .25, .5) * (1 - collapse) * .8 });
+}
+
+// ---------- SCENE B — name (2.0–4.0) ----------
+function sceneB(ctx, t) {
+  bg(ctx, C.indigo);
+  const lt = t - 2;
+  // giant outlined background type drifting in opposite directions
+  ctx.save(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(248,248,243,.09)'; font(ctx, 330, 800, EN, 20); ctx.textBaseline = 'middle';
+  ctx.strokeText('FUTAKAWA FUTAKAWA', -200 - lt * 160, H / 2 - 330);
+  ctx.strokeText('KEISUKE KEISUKE KEISUKE', -900 + lt * 160, H / 2 + 360); ctx.restore();
+  const exit = E.inExpo(P(t, 3.72, 4.0));
+  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(1 + exit * .25, 1 + exit * .25); ctx.translate(-W / 2, -H / 2);
+  // role line typed
+  const roles = 'EDUCATOR  ×  COMMUNITY BUILDER  ×  FOUNDER';
+  const n = Math.floor(roles.length * P(t, 2.12, 2.6));
+  text(ctx, roles.slice(0, n) + (n < roles.length && n > 0 ? '▍' : ''), W / 2, H / 2 - 215, { size: 28, w: 600, ls: 9, align: 'center', color: C.coral });
+  // name
+  riseChars(ctx, '二川佳祐', W / 2, H / 2 + 55, t, 2.2, { size: 250, w: 900, fam: JP, ls: 26, align: 'center', stagger: .07, dur: .5 });
+  const nw = tw(ctx, '二川佳祐', 250, 900, JP, 26);
+  const ul = E.outExpo(P(t, 2.5, 2.95));
+  ctx.fillStyle = C.coral; ctx.fillRect(W / 2 - nw / 2, H / 2 + 95, nw * ul, 10);
+  const ls = lerp(70, 22, E.outExpo(P(t, 2.5, 3.3)));
+  text(ctx, 'KEISUKE FUTAKAWA', W / 2, H / 2 + 175, { size: 44, w: 600, ls, align: 'center', alpha: P(t, 2.5, 2.8) });
+  // tagline block reveal
+  const tag = '学びを「続ける」を、応援する。', tgw = tw(ctx, tag, 48, 800, JP, 4);
+  blockReveal(ctx, t, 2.95, .5, { x: W / 2 - tgw / 2 - 20, y: H / 2 + 222, w: tgw + 40, h: 76 }, C.coral, () =>
+    text(ctx, tag, W / 2, H / 2 + 276, { size: 48, w: 800, fam: JP, ls: 4, align: 'center', color: C.lime }));
+  ctx.restore();
+}
+
+// ---------- SCENE C — numbers (4.0–8.0) ----------
+function statScene(ctx, t, s) {
+  const lt = t - s.t0;
+  bg(ctx, s.bg);
+  const push = 1 + lt * .035;
+  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(push, push); ctx.translate(-W / 2, -H / 2);
+  s.visual && s.visual(ctx, lt);
+  const x = 150, base = H / 2 + 90, size = 330;
+  // index
+  const ip = E.outExpo(P(lt, 0, .3));
+  text(ctx, s.idx, x, H / 2 - 250, { size: 26, w: 700, ls: 6, color: s.accent, alpha: ip });
+  ctx.fillStyle = s.accent; ctx.fillRect(x + 60, H / 2 - 259, 140 * ip, 3);
+  text(ctx, s.kicker, x + 220, H / 2 - 250, { size: 26, w: 600, ls: 6, color: s.fg, alpha: ip * .75 });
+  // counting number rising from a mask
+  const v = Math.round(s.value * E.outExpo(P(lt, .02, .5)));
+  const str = s.fmt(v), full = s.fmt(s.value);
+  const rp = E.outExpo(P(lt, 0, .32));
+  ctx.save(); ctx.beginPath(); ctx.rect(0, base - size * .82, W, size * .92); ctx.clip();
+  text(ctx, str, x, base + (1 - rp) * size, { size, w: 800, ls: -8, color: s.fg });
+  const fw = tw(ctx, full, size, 800, EN, -8);
+  const sp = E.outExpo(P(lt, .12, .45));
+  text(ctx, s.suffix, x + fw + 18, base + (1 - sp) * size, { size: s.suffixSize || 130, w: 800, ls: 0, color: s.accent });
+  ctx.restore();
+  // labels
+  const enw = tw(ctx, s.en, 30, 700, EN, 6);
+  blockReveal(ctx, lt, .16, .42, { x: x - 6, y: base + 42, w: enw + 18, h: 50 }, s.accent, () =>
+    text(ctx, s.en, x, base + 78, { size: 30, w: 700, ls: 6, color: s.accent }));
+  const jw = tw(ctx, s.jp, 52, 800, JP, 2);
+  blockReveal(ctx, lt, .26, .44, { x: x - 6, y: base + 104, w: jw + 18, h: 80 }, s.fg, () =>
+    text(ctx, s.jp, x, base + 164, { size: 52, w: 800, fam: JP, ls: 2, color: s.fg }));
+  ctx.restore();
+}
+const STATS = [
+  { t0: 4, bg: C.paper, fg: C.ink, accent: C.coral, idx: '01', kicker: 'TEACHER', value: 17, fmt: v => String(v), suffix: 'YEARS', suffixSize: 120,
+    en: 'PUBLIC ELEMENTARY SCHOOL TEACHER, TOKYO', jp: '東京都の公立小学校で、教員を17年。',
+    visual(ctx, lt) {
+      const baseY = H / 2 + 225;
+      BARS17.forEach((h, i) => { const p = E.outExpo(P(lt, .08 + i * .022, .5 + i * .022));
+        ctx.fillStyle = i === 16 ? C.coral : C.indigo; ctx.globalAlpha = i === 16 ? 1 : .88;
+        ctx.fillRect(1180 + i * 36, baseY - h * p, 22, h * p); });
+      ctx.globalAlpha = 1; ctx.fillStyle = C.ink; ctx.fillRect(1160, baseY + 8, 640 * E.outExpo(P(lt, 0, .4)), 3);
+    } },
+  { t0: 5, bg: C.ink, fg: C.paper, accent: C.coral, idx: '02', kicker: 'VOICE', value: 1000, fmt: v => v.toLocaleString('en-US'), suffix: '+', suffixSize: 300,
+    en: 'EPISODES ON VOICY — EVERY MORNING SINCE 2023', jp: '2023年9月から、毎朝Voicyで発信。',
+    visual(ctx, lt) {
+      const env = E.outExpo(P(lt, 0, .35)), n = 120;
+      ctx.fillStyle = C.coral; ctx.globalAlpha = .22;
+      for (let i = 0; i < n; i++) { const a = (.25 + .75 * Math.abs(Math.sin(i * .37 + lt * 9)) * Math.abs(Math.sin(i * .113 - lt * 5))) * 330 * env;
+        ctx.fillRect(i * 16 + 4, H / 2 - a, 7, a * 2); }
+      ctx.globalAlpha = 1;
+      const r = 10 + 6 * Math.abs(Math.sin(lt * 12)); circle(ctx, W - 190, H / 2 - 262, r, C.coral);
+      text(ctx, 'ON AIR', W - 220, H / 2 - 252, { size: 24, w: 700, ls: 6, align: 'right', alpha: env });
+    } },
+  { t0: 6, bg: C.coral, fg: C.ink, accent: C.paper, idx: '03', kicker: 'MORNING', value: 8, fmt: v => String(v), suffix: '+ YEARS', suffixSize: 120,
+    en: 'EARLY RISER — EVERY SINGLE MORNING', jp: '早起きを、8年以上つづけている。',
+    visual(ctx, lt) {
+      const hz = H / 2 + 225, cx = 1480, cy = hz + 260 - 430 * E.outExpo(P(lt, .02, .6));
+      ctx.save(); ctx.beginPath(); ctx.rect(900, -100, W, hz + 100); ctx.clip();
+      ctx.strokeStyle = C.paper; ctx.lineWidth = 5; ctx.globalAlpha = .55;
+      for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2 + lt * .8; ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * 250, cy + Math.sin(a) * 250); ctx.lineTo(cx + Math.cos(a) * (330 + (i % 2) * 70), cy + Math.sin(a) * (330 + (i % 2) * 70)); ctx.stroke(); }
+      ctx.globalAlpha = 1; circle(ctx, cx, cy, 210, C.paper); ctx.restore();
+      ctx.fillStyle = C.ink; ctx.fillRect(1090, hz, 830 * E.outExpo(P(lt, 0, .4)), 5);
+    } },
+  { t0: 7, bg: C.indigo, fg: C.paper, accent: C.coral, idx: '04', kicker: 'COMMUNITY', value: 300, fmt: v => String(v), suffix: '+', suffixSize: 300,
+    en: 'MEMBERS · MY CHALLENGE SALON · 7 YEARS', jp: '国内外300人超の、習慣化コミュニティ。',
+    visual(ctx, lt) {
+      const cx = 1470, cy = H / 2;
+      for (const d of SWARM) {
+        const p = E.inOutCubic(P(lt, .12 + d.d, .62 + d.d)), a = d.a + lt * 2.2;
+        const x = lerp(cx + Math.cos(a) * d.r * 1.3, d.gx, p), y = lerp(cy + Math.sin(a) * d.r * .9, d.gy, p);
+        ctx.globalAlpha = .35 + .65 * p; circle(ctx, x, y, 6.5 * E.outBack(P(lt, d.d * .5, d.d * .5 + .2)), d.c ? C.coral : C.paper);
+      }
+      ctx.globalAlpha = 1;
+    } },
+];
+
+// ---------- SCENE D — journey timeline (8.0–11.0) ----------
+const MILES = [
+  { tag: 'ORIGIN', title: '東京学芸大学', sub: 'Tokyo Gakugei University' },
+  { tag: '17 YEARS', title: '公立小学校 教員', sub: 'Public school teacher, Tokyo' },
+  { tag: 'COMMUNITY', title: 'BeYond Labo 代表', sub: '教育と社会の壁をなくす' },
+  { tag: '2026.03', title: '教壇を卒業', sub: 'Leaving the classroom, not education' },
+  { tag: '2026.05', title: '株式会社E3 Habit 創業', sub: 'Founder, E3 Habit, Inc.' },
+];
+const SP = 1000;
+function camX(t) { let x = -900, prev = -900;
+  for (let i = 0; i < 5; i++) { const m = E.inOutQuart(P(t, 8 + .5 * i, 8 + .5 * i + .24)); x += (i * SP - prev) * m; prev = i * SP; } return x; }
+function sceneD(ctx, t) {
+  bg(ctx, C.ink);
+  const cx = camX(t), ly = H / 2 + 30;
+  const z = Math.exp(Math.log(70) * E.inExpo(P(t, 10.5, 11.0)));
+  // parallax starfield of crosses
+  ctx.strokeStyle = C.paper; ctx.lineWidth = 2;
+  for (const s of STARS) { const x = ((s.x - cx * s.z) % 2400 + 2400) % 2400 - 240, y = ly + s.y;
+    const sx = W / 2 + (x - W / 2) * z, sy = ly + (y - ly) * z;
+    ctx.globalAlpha = .08 + s.s * .12; ctx.beginPath(); ctx.moveTo(sx - 6, sy); ctx.lineTo(sx + 6, sy); ctx.moveTo(sx, sy - 6); ctx.lineTo(sx, sy + 6); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  ctx.save(); ctx.translate(W / 2, ly); ctx.scale(z, z); ctx.translate(-cx, 0);
+  ctx.fillStyle = 'rgba(248,248,243,.18)'; ctx.fillRect(-2000, -2, 8000, 4);
+  ctx.fillStyle = C.coral; ctx.fillRect(-2000, -3, cx + 2000, 6);
+  MILES.forEach((m, i) => {
+    const wx = i * SP, ta = 8 + .5 * i + .2, p = P(t, ta, ta + .3);
+    const reached = t >= ta - .02;
+    ctx.lineWidth = 5; ctx.strokeStyle = C.paper; ctx.beginPath(); ctx.arc(wx, 0, 22, 0, Math.PI * 2); ctx.stroke();
+    circle(ctx, wx, 0, reached ? 22 * E.outBack(clamp(P(t, ta - .02, ta + .18))) : 0, C.coral);
+    if (reached) { ctx.globalAlpha = 1 - P(t, ta, ta + .4); ctx.strokeStyle = C.coral; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(wx, 0, 22 + 90 * E.outExpo(P(t, ta, ta + .4)), 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
+    const tgw = tw(ctx, m.tag, 28, 700, EN, 8);
+    blockReveal(ctx, t, ta - .05, .35, { x: wx - tgw / 2 - 12, y: -212, w: tgw + 24, h: 46 }, C.coral, () =>
+      text(ctx, m.tag, wx, -178, { size: 28, w: 700, ls: 8, align: 'center', color: C.coral }));
+    riseChars(ctx, m.title, wx, -70, t, ta, { size: 80, w: 800, fam: MIX, ls: 2, align: 'center', stagger: .018, dur: .35 });
+    text(ctx, m.sub, wx, 92, { size: 30, w: 500, fam: MIX, ls: 2, align: 'center', alpha: E.outCubic(P(t, ta + .08, ta + .3)) * .7 });
+  });
+  ctx.restore();
+  text(ctx, 'THE JOURNEY', 150, 170, { size: 26, w: 700, ls: 8, color: C.coral, alpha: P(t, 8, 8.3) * (1 - P(t, 10.5, 10.7)) });
+}
+
+// ---------- SCENE E1 — three pillars (11.0–12.0) ----------
+function sceneE1(ctx, t) {
+  bg(ctx, C.paper);
+  const pil = [[C.coral, '教育', 'EDUCATION', C.ink], [C.indigo, '習慣', 'HABIT', C.paper], [C.lime, 'コミュニティ', 'COMMUNITY', C.ink]];
+  const conv = E.inExpo(P(t, 11.7, 12.0)), rot = (t - 11) * .5;
+  const cx = W / 2, cy = H / 2 + 40;
+  const pos = pil.map((_, i) => { const a = -Math.PI / 2 + i * Math.PI * 2 / 3 + rot, fly = E.outExpo(P(t, 11.02 + i * .08, 11.45 + i * .08));
+    const d = lerp(1500, 165, fly) * (1 - conv); return [cx + Math.cos(a) * d, cy + Math.sin(a) * d, a]; });
+  ctx.save(); ctx.globalCompositeOperation = 'multiply';
+  pil.forEach((p, i) => circle(ctx, pos[i][0], pos[i][1], 245 * (1 - conv * .96), p[0]));
+  ctx.restore();
+  const la = 1 - P(t, 11.62, 11.74);
+  pil.forEach((p, i) => { const [x, y, a] = pos[i], lx = x + Math.cos(a) * 95, lyy = y + Math.sin(a) * 95;
+    text(ctx, p[1], lx, lyy + 12, { size: p[1].length > 2 ? 50 : 84, w: 900, fam: JP, align: 'center', color: p[3], alpha: la });
+    text(ctx, p[2], lx, lyy + 58, { size: 20, w: 700, ls: 6, align: 'center', color: p[3], alpha: la * .8 }); });
+  text(ctx, 'WHAT I WORK ON', W / 2, 150, { size: 26, w: 700, ls: 10, align: 'center', color: C.ink, alpha: P(t, 11.1, 11.3) * la });
+}
+
+// ---------- SCENE E2 — break the wall (12.0–13.0) ----------
+const TI = 12.42;
+function sceneE2(ctx, t) {
+  bg(ctx, C.paper);
+  const tau = t - TI;
+  // words: 教育 | 社会 → merge into one sentence
+  const L1 = ['教育', 'と', '社会', 'の'], s1 = 132;
+  const ws = L1.map(s => tw(ctx, s, s1, 900, JP, 4)), tot = ws.reduce((a, b) => a + b, 0) + 4 * 3;
+  let acc = W / 2 - tot / 2; const fx = ws.map(w => { const x = acc + w / 2; acc += w + 4; return x; });
+  const m = E.outExpo(P(t, TI + .02, TI + .34));
+  const push = E.inExpo(P(t, 12.28, TI)) * 50;
+  [[0, W / 2 - 560 + push], [2, W / 2 + 560 - push]].forEach(([k, x0], j) => {
+    const pop = E.outBack(P(t, 12.03 + j * .07, 12.28 + j * .07));
+    const x = lerp(x0, fx[k], m), y = lerp(H / 2 + 55, H / 2 - 10, m), s = lerp(160, s1, m) * pop;
+    if (s > 0) text(ctx, L1[k], x, y, { size: s, w: 900, fam: JP, ls: 4, align: 'center', color: C.ink });
+  });
+  [1, 3].forEach(k => { const p = E.outBack(P(t, TI + .2, TI + .42)); if (p > 0) text(ctx, L1[k], fx[k], H / 2 - 10, { size: s1 * p, w: 900, fam: JP, align: 'center', color: C.ink }); });
+  const l2 = '壁を、なくす。', l2w = tw(ctx, l2, s1, 900, JP, 4);
+  blockReveal(ctx, t, TI + .24, .4, { x: W / 2 - l2w / 2 - 20, y: H / 2 + 20, w: l2w + 40, h: 160 }, C.indigo, () =>
+    text(ctx, l2, W / 2, H / 2 + 150, { size: s1, w: 900, fam: JP, ls: 4, align: 'center', color: C.coral }));
+  text(ctx, 'BeYond Labo — VISION', W / 2, H / 2 - 230, { size: 28, w: 700, ls: 10, align: 'center', color: C.coral, alpha: P(t, TI + .3, TI + .5) });
+  // the wall
+  const quake = tau < 0 ? E.inExpo(P(t, 12.25, TI)) * 7 : 0;
+  for (const b of BRICKS) {
+    const rb = 14 - b.row, t0 = 12.0 + rb * .011 + b.col * .004, pin = E.outCubic(P(t, t0, t0 + .15));
+    if (pin <= 0) continue;
+    let x = b.x, y = b.y - (1 - pin) * 1100, r = 0;
+    if (tau > 0) { x += b.vx * tau; y += b.vy * tau + 2800 * tau * tau; r = b.vr * tau; }
+    else { x += Math.sin(t * 90 + b.shade * 20) * quake; y += Math.cos(t * 77 + b.shade * 9) * quake; }
+    if (y > H + 200) continue;
+    ctx.save(); ctx.translate(x + b.w / 2, y + b.h / 2); ctx.rotate(r);
+    ctx.fillStyle = b.shade > .85 ? C.coral : `hsl(238, 65%, ${24 + b.shade * 14}%)`;
+    ctx.fillRect(-b.w / 2 + 3, -b.h / 2 + 3, b.w - 6, b.h - 6); ctx.restore();
+  }
+}
+
+// ---------- SCENE F — finale (13.0–15.0) ----------
+function sceneF(ctx, t) {
+  bg(ctx, C.ink);
+  // bookend: the 365-day grid returns, lighting up day by day
+  const gp = P(t, 13.9, 14.85);
+  GRID.forEach((g, k) => { if (k / 365 > gp) return; ctx.globalAlpha = k / 365 > gp - .03 ? .5 : .1; circle(ctx, g.x, g.y, 5, k / 365 > gp - .03 ? C.coral : C.paper); });
+  ctx.globalAlpha = 1;
+  const out = E.inExpo(P(t, 13.74, 13.92));
+  if (out < 1) {
+    ctx.save(); ctx.translate(0, -out * 140); ctx.globalAlpha = 1 - out;
+    riseChars(ctx, '続ける人を、', W / 2, H / 2 - 40, t, 13.02, { size: 132, w: 900, fam: JP, ls: 8, align: 'center', stagger: .035, dur: .4, ease: E.outBack });
+    riseChars(ctx, 'ずっと応援する。', W / 2, H / 2 + 130, t, 13.26, { size: 132, w: 900, fam: JP, ls: 8, align: 'center', stagger: .035, dur: .4, ease: E.outBack, color: C.coral });
+    ctx.restore(); ctx.globalAlpha = 1;
+  }
+  if (t < 13.9) return;
+  const ly = H / 2 + 40;
+  const dot = E.outBack(P(t, 13.9, 14.02)), line = E.outExpo(P(t, 14.0, 14.4));
+  circle(ctx, W / 2, ly, 16 * dot * (1 - line), C.coral);
+  ctx.fillStyle = C.coral; ctx.fillRect(W / 2 - 420 * line, ly - 4, 840 * line, 8);
+  const np = E.outExpo(P(t, 14.02, 14.45));
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ly - 12); ctx.clip();
+  text(ctx, '二川佳祐', W / 2, ly - 42 + (1 - np) * 190, { size: 160, w: 900, fam: JP, ls: 30, align: 'center' });
+  ctx.restore();
+  const sp = E.outExpo(P(t, 14.12, 14.6));
+  text(ctx, 'KEISUKE FUTAKAWA', W / 2, ly + 78, { size: 38, w: 600, ls: lerp(44, 18, sp), align: 'center', alpha: sp });
+  text(ctx, 'Founder, E3 Habit, Inc.   ·   BeYond Labo', W / 2, ly + 138, { size: 28, w: 500, ls: 3, align: 'center', alpha: E.outCubic(P(t, 14.22, 14.55)) * .75 });
+  text(ctx, 'Voicy 毎朝配信   ·   Instagram @futakawa.sensei', W / 2, ly + 190, { size: 24, w: 500, fam: MIX, ls: 3, align: 'center', color: C.coral, alpha: E.outCubic(P(t, 14.32, 14.65)) });
+}
+
+// ---------- master timeline ----------
+function scene(ctx, t) {
+  if (t < 2) { sceneA(ctx, t); if (t > 1.8) slab(ctx, P(t, 1.8, 2.0), C.indigo); }
+  else if (t < 4) { sceneB(ctx, t); if (t < 2.18) { ctx.fillStyle = C.coral; const q = E.inOutCubic(P(t, 2, 2.18)); ctx.fillRect(lerp(0, W, q), 0, 40 * (1 - q), H); } if (t > 3.75) iris(ctx, P(t, 3.75, 4.0), W / 2, H / 2, C.paper); }
+  else if (t < 8) { const i = Math.floor(t - 4); statScene(ctx, t, STATS[i]);
+    if (i === 0 && t > 4.8) shutter(ctx, P(t, 4.8, 5.0), C.ink);
+    if (i === 1 && t > 5.8) slab(ctx, P(t, 5.8, 6.0), C.coral, C.indigo);
+    if (i === 2 && t > 6.8) iris(ctx, P(t, 6.8, 7.0), 1480, H / 2 + 225 + 260 - 430, C.indigo, C.paper);
+    if (i === 3 && t > 7.8) shutter(ctx, P(t, 7.8, 8.0), C.ink, 6, false); }
+  else if (t < 11) sceneD(ctx, t);
+  else if (t < 12) sceneE1(ctx, t);
+  else if (t < 13) { sceneE2(ctx, t); if (t > 12.82) slab(ctx, P(t, 12.82, 13.0), C.ink); }
+  else sceneF(ctx, t);
+  if (t >= 11 && t < 11.25) { // zoom-through exit: coral fills, then a hole opens
+    const r = Math.hypot(W, H) * .6 * E.outExpo(P(t, 11, 11.25));
+    ctx.fillStyle = C.coral; ctx.beginPath(); ctx.rect(-200, -200, W + 400, H + 400); ctx.arc(W / 2, H / 2 + 30, r, 0, Math.PI * 2, true); ctx.fill();
+  }
+}
+const CHAPTERS = [[0, 'PROLOGUE'], [2, 'WHO'], [4, 'NUMBERS'], [8, 'JOURNEY'], [11, 'MISSION'], [13, 'NEXT']];
+const HITS = [[.5, .6], [1, .6], [1.5, .8], [2, 1.3], [2.25, .5], [4, 1], [5, .9], [6, .9], [7, .9], [8, 1], [8.72, .5], [9.22, .5], [9.72, .5], [10.22, .6], [11, 1.3], [TI, 2.2], [13.95, 1.1]];
+const decay = (t, h, k) => t >= h ? Math.exp(-(t - h) * k) : 0;
+function camera(t) {
+  let punch = 0, shake = 0, split = 0, flash = 0;
+  for (const [h, s] of HITS) { const d = decay(t, h, 13); punch += d * s; shake += decay(t, h, 11) * s * s; split += decay(t, h, 15) * s; }
+  flash = decay(t, TI, 16) * .55 + decay(t, 2, 22) * .25 + decay(t, 11, 20) * .2;
+  const sx = Math.sin(t * 97) * Math.cos(t * 41) * shake * 12, sy = Math.cos(t * 83) * Math.sin(t * 57) * shake * 12;
+  return { s: 1 + punch * .022, sx, sy, rot: Math.sin(t * 71) * shake * .004, split: split * 7, flash };
+}
+
+// ---------- compositor ----------
+const out = document.getElementById('out'), octx = out.getContext('2d');
+const sc = document.createElement('canvas'); sc.width = W; sc.height = H; const sctx = sc.getContext('2d');
+const grains = [0, 1, 2, 3].map(k => { const g = document.createElement('canvas'); g.width = g.height = 256; const x = g.getContext('2d'), R = rng(99 + k), id = x.createImageData(256, 256);
+  for (let i = 0; i < id.data.length; i += 4) { const v = R() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } x.putImageData(id, 0, 0); return g; });
+const vignette = (() => { const g = octx.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * 1.05); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.42)'); return g; })();
+
+function drawSub(t) {
+  const cam = camera(t);
+  sctx.setTransform(1, 0, 0, 1, 0, 0); sctx.globalAlpha = 1; sctx.globalCompositeOperation = 'source-over';
+  sctx.translate(W / 2 + cam.sx, H / 2 + cam.sy); sctx.rotate(cam.rot); sctx.scale(cam.s, cam.s); sctx.translate(-W / 2, -H / 2);
+  scene(sctx, t);
+  sctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+function rgbSplit(ctx, a) {
+  a = Math.round(a); if (a < 1) return;
+  const id = ctx.getImageData(0, 0, W, H), d = id.data, src = new Uint8ClampedArray(d);
+  for (let y = 0; y < H; y++) { const row = y * W;
+    for (let x = 0; x < W; x++) { const i = (row + x) * 4;
+      d[i] = src[(row + Math.min(W - 1, x + a)) * 4]; d[i + 2] = src[(row + Math.max(0, x - a)) * 4 + 2]; } }
+  ctx.putImageData(id, 0, 0);
+}
+function hud(ctx, t) {
+  ctx.save(); ctx.globalCompositeOperation = 'difference'; ctx.globalAlpha = .8 * P(t, .15, .5);
+  ctx.strokeStyle = '#fff'; ctx.fillStyle = '#fff'; ctx.lineWidth = 2; const m = 56, L = 34;
+  [[m, m, 1, 1], [W - m, m, -1, 1], [m, H - m, 1, -1], [W - m, H - m, -1, -1]].forEach(([x, y, dx, dy]) => { ctx.beginPath(); ctx.moveTo(x + dx * L, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * L); ctx.stroke(); });
+  font(ctx, 19, 600, EN, 5); ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left'; ctx.fillText('KEISUKE FUTAKAWA — SHOWREEL 2026', m + 50, m + 6);
+  const f = Math.min(DUR * FPS - 1, Math.floor(t * FPS));
+  ctx.textAlign = 'right'; ctx.fillText(`00:00:${String(Math.floor(f / FPS)).padStart(2, '0')}:${String(f % FPS).padStart(2, '0')}`, W - m - 50, m + 6);
+  let ch = 0; CHAPTERS.forEach((c, i) => { if (t >= c[0]) ch = i; });
+  ctx.textAlign = 'left'; ctx.fillText(`${String(ch + 1).padStart(2, '0')} / 06   ${CHAPTERS[ch][1]}`, m + 50, H - m - 6);
+  ctx.globalAlpha *= .35; ctx.fillRect(W - m - 50 - 260, H - m - 7, 260, 2); ctx.globalAlpha = .8 * P(t, .15, .5);
+  ctx.fillRect(W - m - 50 - 260, H - m - 8, 260 * clamp(t / DUR), 4);
+  ctx.restore();
+}
+function renderFrame(t, subs = 5) {
+  const shutterLen = .5 / FPS;
+  octx.globalCompositeOperation = 'source-over';
+  for (let i = 0; i < subs; i++) {
+    drawSub(t + (subs > 1 ? (i / subs) * shutterLen : 0));
+    octx.globalAlpha = 1 / (i + 1); octx.drawImage(sc, 0, 0);
+  }
+  octx.globalAlpha = 1;
+  const cam = camera(t);
+  if (subs > 1) rgbSplit(octx, cam.split);
+  if (cam.flash > .01) { octx.fillStyle = `rgba(255,255,255,${cam.flash})`; octx.fillRect(0, 0, W, H); }
+  octx.fillStyle = vignette; octx.fillRect(0, 0, W, H);
+  const f = Math.floor(t * FPS), g = grains[f % 4];
+  octx.save(); octx.globalCompositeOperation = 'overlay'; octx.globalAlpha = .07;
+  octx.fillStyle = octx.createPattern(g, 'repeat'); octx.translate((f * 73) % 256, (f * 151) % 256); octx.fillRect(-256, -256, W + 512, H + 512); octx.restore();
+  hud(octx, t);
+}
+
+// ---------- boot ----------
+const JPTEXT = '毎日を積み重ねる人。二川佳祐学びを「続ける」を、応援する。東京都の公立小学校で教員を17年。2023年9月から毎朝Voicyで発信。早起きを8年以上つづけている。国内外300人超の習慣化コミュニティ。東京学芸大学公立小学校教員BeYond Labo代表教育と社会の壁をなくす教壇を卒業株式会社E3 Habit創業習慣コミュニティ続ける人をずっと応援する。毎朝配信';
+window.ready = (async () => {
+  await Promise.all(['500', '700', '800', '900'].map(w => document.fonts.load(`${w} 40px "M PLUS 1"`, JPTEXT)).concat(['500', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px "Poppins"`, 'ABCxyz0123'))));
+  await document.fonts.ready;
+  return true;
+})();
+window.renderFrame = renderFrame;
+if (new URLSearchParams(location.search).has('render')) document.body.classList.add('render');
+else window.ready.then(() => {
+  renderFrame(4.62, 1);
+  const audio = document.getElementById('music'), btn = document.getElementById('play');
+  let start = null;
+  btn.addEventListener('click', () => { btn.style.display = 'none'; audio.currentTime = 0; audio.play().catch(() => {}); start = performance.now();
+    (function loop() { const t = audio.duration && !audio.paused ? audio.currentTime : ((performance.now() - start) / 1000) % DUR;
+      renderFrame(Math.min(t, DUR - .001), 1); if (audio.ended) { audio.currentTime = 0; audio.play(); } requestAnimationFrame(loop); })();
+  });
+});
+</script>
+</body>
+</html>
